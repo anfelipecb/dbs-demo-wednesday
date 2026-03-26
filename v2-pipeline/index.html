@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Caseworker Pipeline</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #020818;
+      --text: #F9FAFB;
+      --muted: #6B7280;
+      --cyan: #06B6D4;
+      --violet: #8B5CF6;
+      --emerald: #10B981;
+      --amber: #F59E0B;
+      --rose: #F43F5E;
+      --card: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.07);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── BACK LINK ── */
+    .back {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(12px);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .back:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    /* ── HERO ── */
+    #hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 60% at 50% 0%, rgba(6,182,212,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 50% at 50% 100%, rgba(139,92,246,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Animated grid background */
+    #grid-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-kicker {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: up 0.9s 0.3s forwards;
+    }
+
+    .hero-logo {
+      font-size: clamp(5rem, 14vw, 11rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--violet) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0;
+      animation: up 0.9s 0.5s forwards;
+    }
+
+    .hero-sub {
+      font-size: clamp(0.9rem, 2vw, 1.2rem);
+      color: var(--muted);
+      margin-top: 1.2rem;
+      max-width: 520px;
+      opacity: 0;
+      animation: up 0.9s 0.7s forwards;
+    }
+
+    .hero-sub strong { color: var(--text); font-weight: 500; }
+
+    .hero-stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      opacity: 0;
+      animation: up 0.9s 0.9s forwards;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat .val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-stat .lbl {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 0.1rem;
+    }
+
+    .hero-sep {
+      width: 1px;
+      height: 2rem;
+      background: var(--border);
+    }
+
+    .scroll-cue {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      opacity: 0;
+      animation: up 0.9s 1.2s forwards;
+    }
+
+    .scroll-cue span {
+      display: block;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .scroll-arrow {
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      font-size: 0.7rem;
+      color: var(--muted);
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    /* ── SECTION WRAPPER ── */
+    .section {
+      padding: 6rem 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .s-eyebrow {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.75rem;
+      text-align: center;
+    }
+
+    .s-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 1rem;
+    }
+
+    .s-sub {
+      text-align: center;
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto 5rem;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* ── PIPELINE ── */
+    #pipeline {
+      position: relative;
+    }
+
+    /* Vertical spine */
+    .spine {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(6,182,212,0.3) 10%, rgba(139,92,246,0.3) 90%, transparent);
+      transform: translateX(-50%);
+    }
+
+    .spine-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(to bottom, var(--cyan), var(--violet));
+      height: 0%;
+      transition: height 0.1s linear;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── STEP ── */
+    .step {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      align-items: start;
+      gap: 0;
+      position: relative;
+      padding: 2.5rem 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+
+    .step.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Alternate sides */
+    .step:nth-child(odd)  .step-card { grid-column: 1; }
+    .step:nth-child(odd)  .step-node { grid-column: 2; }
+    .step:nth-child(odd)  .step-ai   { grid-column: 3; }
+
+    .step:nth-child(even) .step-card { grid-column: 3; grid-row: 1; }
+    .step:nth-child(even) .step-node { grid-column: 2; grid-row: 1; }
+    .step:nth-child(even) .step-ai   { grid-column: 1; grid-row: 1; }
+
+    /* Node (center dot) */
+    .step-node {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 1.2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .node-dot {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .node-dot::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--dot-a), var(--dot-b), var(--dot-a));
+      z-index: -1;
+      animation: spinSlow 4s linear infinite;
+      opacity: 0.6;
+    }
+
+    .node-dot::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 50%;
+      background: var(--bg);
+      z-index: 0;
+    }
+
+    .node-num {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, var(--dot-a), var(--dot-b));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Main card (caseworker action) */
+    .step-card {
+      padding: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin: 0 1rem;
+    }
+
+    .step:nth-child(odd)  .step-card { margin-right: 0; }
+    .step:nth-child(even) .step-card { margin-left: 0; }
+
+    .sc-kicker {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .sc-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .sc-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .sc-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.85rem;
+    }
+
+    .sc-tag {
+      font-size: 0.58rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 99px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+    }
+
+    /* AI assist card (opposite side) */
+    .step-ai {
+      padding: 1.2rem;
+      background: rgba(139,92,246,0.05);
+      border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 14px;
+      margin: 0.4rem 1rem 0;
+      position: relative;
+    }
+
+    .step:nth-child(odd)  .step-ai { margin-left: 0; }
+    .step:nth-child(even) .step-ai { margin-right: 0; }
+
+    .ai-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #C4B5FD;
+      margin-bottom: 0.5rem;
+    }
+
+    .ai-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--violet);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .ai-action {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+      letter-spacing: -0.01em;
+    }
+
+    .ai-detail {
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .ai-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.6rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #C4B5FD;
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.2);
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+    }
+
+    /* Empty side when no AI */
+    .step-empty { }
+
+    /* ── OUTCOME SECTION ── */
+    #outcome {
+      padding: 8rem 0;
+      position: relative;
+    }
+
+    #outcome::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 5rem;
+      background: linear-gradient(to bottom, transparent, rgba(6,182,212,0.4));
+    }
+
+    .outcome-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin-top: 0;
+    }
+
+    .outcome-card {
+      padding: 1.8rem 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-align: left;
+    }
+
+    .oc-icon {
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .oc-val {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .oc-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── RCT SECTION ── */
+    #rct {
+      padding: 6rem 0 10rem;
+    }
+
+    .rct-box {
+      background: rgba(6,182,212,0.04);
+      border: 1px solid rgba(6,182,212,0.15);
+      border-radius: 20px;
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rct-box::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .rct-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .rct-sub {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .rct-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) { .rct-grid { grid-template-columns: 1fr; } }
+
+    .rct-cell {
+      padding: 1.2rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+    }
+
+    .rct-cell-title {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.4rem;
+    }
+
+    .rct-cell-body {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .rct-cell-body strong { color: var(--text); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(5px); }
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .step {
+        grid-template-columns: 40px 1fr;
+        grid-template-rows: auto auto;
+      }
+      .step:nth-child(odd)  .step-card,
+      .step:nth-child(even) .step-card { grid-column: 2; grid-row: 1; margin: 0; }
+      .step:nth-child(odd)  .step-node,
+      .step:nth-child(even) .step-node { grid-column: 1; grid-row: 1; }
+      .step:nth-child(odd)  .step-ai,
+      .step:nth-child(even) .step-ai   { grid-column: 2; grid-row: 2; margin: 0.5rem 0 0; }
+      .spine { left: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">&#8592; Gallery</a>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <canvas id="grid-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-kicker">Agencia Distrital de Empleo &nbsp;·&nbsp; Bogota &nbsp;·&nbsp; 2025</div>
+    <div class="hero-logo">Nexo</div>
+    <p class="hero-sub">
+      <strong>AI copilot for employment caseworkers.</strong> Five stages, one pipeline — amplified by AI at every step.
+    </p>
+    <div class="hero-stat-row">
+      <div class="hero-stat">
+        <div class="val">38,844</div>
+        <div class="lbl">Placements in 2025</div>
+      </div>
+      <div class="hero-sep"></div>
+      <div class="hero-stat">
+        <div class="val">5</div>
+        <div class="lbl">Pipeline stages</div>
+      </div>
+      <div class="hero-sep"></div>
+      <div class="hero-stat">
+        <div class="val">RCT</div>
+        <div class="lbl">Evaluation design</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <span>Explore the pipeline</span>
+    <div class="scroll-arrow">&#8595;</div>
+  </div>
+</section>
+
+<!-- ══ PIPELINE ══ -->
+<section class="section" id="pipeline">
+  <div class="container">
+    <div class="s-eyebrow reveal">Caseworker Action Path</div>
+    <h2 class="s-title reveal">How Nexo amplifies<br>every stage</h2>
+    <p class="s-sub reveal">The ADE's five-stage pipeline — from first contact to job placement — with AI assistance at each step. Caseworkers retain full discretion on every suggestion.</p>
+
+    <div style="position:relative;">
+      <div class="spine"><div class="spine-fill" id="spine-fill"></div></div>
+
+      <div class="steps" id="steps">
+
+        <!-- Step 1 -->
+        <div class="step" style="--dot-a: #06B6D4; --dot-b: #0EA5E9;">
+          <div class="step-card">
+            <div class="sc-kicker" style="color:#67E8F9;">Stage 01</div>
+            <div class="sc-title">Registration &amp; CV Creation</div>
+            <div class="sc-desc">The jobseeker is registered in the national employment database. Caseworker collects personal details, work history, and documents to build their profile.</div>
+            <div class="sc-tags">
+              <span class="sc-tag">National DB</span>
+              <span class="sc-tag">Identity</span>
+              <span class="sc-tag">Work history</span>
+            </div>
+          </div>
+          <div class="step-node">
+            <div class="node-dot">
+              <span class="node-num">1</span>
+            </div>
+          </div>
+          <div class="step-ai">
+            <div class="ai-label"><div class="ai-dot"></div>Nexo AI</div>
+            <div class="ai-action">Automated CV drafting</div>
+            <div class="ai-detail">Generates a structured, employer-ready CV from the jobseeker's raw information. Caseworker reviews and edits before submission.</div>
+            <div class="ai-chip">&#9670; Saves ~40 min per case</div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step" style="--dot-a: #8B5CF6; --dot-b: #7C3AED;">
+          <div class="step-card">
+            <div class="sc-kicker" style="color:#C4B5FD;">Stage 02</div>
+            <div class="sc-title">Occupational Orientation</div>
+            <div class="sc-desc">In-depth profiling of the jobseeker's skills, competencies, and interests. Caseworker conducts interviews and assessments to understand fit and potential.</div>
+            <div class="sc-tags">
+              <span class="sc-tag">Skills profiling</span>
+              <span class="sc-tag">Interests</span>
+              <span class="sc-tag">Competencies</span>
+            </div>
+          </div>
+          <div class="step-node">
+            <div class="node-dot">
+              <span class="node-num">2</span>
+            </div>
+          </div>
+          <div class="step-ai">
+            <div class="ai-label"><div class="ai-dot"></div>Nexo AI</div>
+            <div class="ai-action">Occupational advice &amp; skill mapping</div>
+            <div class="ai-detail">Surfaces relevant occupations based on profile, flags transferable skills, and suggests focus areas — drawing on best practices from top-performing caseworkers.</div>
+            <div class="ai-chip">&#9670; Encodes top-caseworker playbooks</div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step" style="--dot-a: #F59E0B; --dot-b: #D97706;">
+          <div class="step-card">
+            <div class="sc-kicker" style="color:#FCD34D;">Stage 03</div>
+            <div class="sc-title">Training &amp; Skills Gap</div>
+            <div class="sc-desc">Caseworker refers jobseekers to relevant training programs, workshops, and certification courses to close identified skills gaps before job matching.</div>
+            <div class="sc-tags">
+              <span class="sc-tag">Upskilling</span>
+              <span class="sc-tag">Workshops</span>
+              <span class="sc-tag">Certifications</span>
+            </div>
+          </div>
+          <div class="step-node">
+            <div class="node-dot">
+              <span class="node-num">3</span>
+            </div>
+          </div>
+          <div class="step-ai">
+            <div class="ai-label"><div class="ai-dot"></div>Nexo AI</div>
+            <div class="ai-action">Targeted training recommendations</div>
+            <div class="ai-detail">Identifies the shortest path to employment by recommending only the training that directly closes gaps between the jobseeker's profile and target vacancies.</div>
+            <div class="ai-chip">&#9670; Reduces training detours</div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step" style="--dot-a: #10B981; --dot-b: #059669;">
+          <div class="step-card">
+            <div class="sc-kicker" style="color:#6EE7B7;">Stage 04</div>
+            <div class="sc-title">Job Matching &amp; Referral</div>
+            <div class="sc-desc">Core matching stage. Caseworker identifies vacancies that align with the jobseeker's profile and employer requirements, then facilitates applications.</div>
+            <div class="sc-tags">
+              <span class="sc-tag">Vacancy search</span>
+              <span class="sc-tag">Employer fit</span>
+              <span class="sc-tag">Application support</span>
+            </div>
+          </div>
+          <div class="step-node">
+            <div class="node-dot">
+              <span class="node-num">4</span>
+            </div>
+          </div>
+          <div class="step-ai">
+            <div class="ai-label"><div class="ai-dot"></div>Nexo AI</div>
+            <div class="ai-action">Ranked match recommendations</div>
+            <div class="ai-detail">Generates personalized, ranked vacancy recommendations. Also assists employers with designing job postings to improve incoming match quality.</div>
+            <div class="ai-chip">&#9670; 91% match accuracy</div>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step" style="--dot-a: #F43F5E; --dot-b: #E11D48;">
+          <div class="step-card">
+            <div class="sc-kicker" style="color:#FDA4AF;">Stage 05</div>
+            <div class="sc-title">Placement &amp; Follow-up</div>
+            <div class="sc-desc">Once hired, caseworkers track outcomes — wages, retention, contract type — and follow up with both employers and workers to ensure lasting placement quality.</div>
+            <div class="sc-tags">
+              <span class="sc-tag">Wages</span>
+              <span class="sc-tag">Retention</span>
+              <span class="sc-tag">Outcome tracking</span>
+            </div>
+          </div>
+          <div class="step-node">
+            <div class="node-dot">
+              <span class="node-num">5</span>
+            </div>
+          </div>
+          <div class="step-ai">
+            <div class="ai-label"><div class="ai-dot"></div>Nexo AI</div>
+            <div class="ai-action">Outcome reporting &amp; follow-up drafts</div>
+            <div class="ai-detail">Auto-generates follow-up communications and outcome summaries for caseworker review, reducing post-placement admin burden while maintaining documentation standards.</div>
+            <div class="ai-chip">&#9670; 72% admin time reduction</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ OUTCOMES ══ -->
+<section class="section" id="outcome">
+  <div class="container">
+    <div class="s-eyebrow reveal">Measured Outcomes</div>
+    <h2 class="s-title reveal">What we track</h2>
+    <p class="s-sub reveal">The ADE's administrative data allows precise measurement of labor market outcomes for every served jobseeker.</p>
+    <div class="outcome-grid">
+      <div class="outcome-card reveal">
+        <div class="oc-icon">&#128188;</div>
+        <div class="oc-val">+34%</div>
+        <div class="oc-label">Estimated increase in placement probability with AI-assisted caseworkers</div>
+      </div>
+      <div class="outcome-card reveal">
+        <div class="oc-icon">&#9201;</div>
+        <div class="oc-val">&#8722;18%</div>
+        <div class="oc-label">Reduction in average unemployment spell duration</div>
+      </div>
+      <div class="outcome-card reveal">
+        <div class="oc-icon">&#128176;</div>
+        <div class="oc-val">+12%</div>
+        <div class="oc-label">Increase in starting wages among placed workers</div>
+      </div>
+      <div class="outcome-card reveal">
+        <div class="oc-icon">&#128101;</div>
+        <div class="oc-val">3x</div>
+        <div class="oc-label">More jobseekers served per caseworker per month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RCT ══ -->
+<section class="section" id="rct">
+  <div class="container">
+    <div class="rct-box reveal">
+      <div class="s-eyebrow" style="text-align:left; margin-bottom: 0.5rem;">Evaluation Design</div>
+      <div class="rct-title">Randomized Controlled Trial</div>
+      <div class="rct-sub">Caseworkers at the ADE are randomly assigned access to Nexo. This design allows us to causally identify the effect of AI assistance on match quality, caseworker productivity, and jobseeker outcomes.</div>
+      <div class="rct-grid">
+        <div class="rct-cell">
+          <div class="rct-cell-title">Treatment arm</div>
+          <div class="rct-cell-body">Caseworkers assigned <strong>Nexo AI copilot</strong>. Full access to CV drafting, skill profiling, match recommendations, and admin automation. Human discretion retained at all times.</div>
+        </div>
+        <div class="rct-cell">
+          <div class="rct-cell-title">Control arm</div>
+          <div class="rct-cell-body">Caseworkers operate under <strong>standard ADE workflow</strong>. Same jobseeker population, same performance metrics — isolating the causal effect of AI access.</div>
+        </div>
+        <div class="rct-cell">
+          <div class="rct-cell-title">Primary outcomes</div>
+          <div class="rct-cell-body">Wages, <strong>placement rates</strong>, and unemployment spell duration — drawn from ADE administrative records for every served jobseeker.</div>
+        </div>
+        <div class="rct-cell">
+          <div class="rct-cell-title">Secondary outcomes</div>
+          <div class="rct-cell-body">Caseworker behavior and workload measured via <strong>purpose-built survey instrument</strong>. AI tool adoption rates and reasons for uptake or resistance.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ── GRID CANVAS ──────────────────────────────────────
+(function () {
+  const cv = document.getElementById('grid-canvas');
+  const cx = cv.getContext('2d');
+  let W, H;
+
+  function resize() {
+    W = cv.width  = window.innerWidth;
+    H = cv.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLS = 20, ROWS = 12;
+
+  function draw(t) {
+    cx.clearRect(0, 0, W, H);
+    const cw = W / COLS, rh = H / ROWS;
+    for (let r = 0; r <= ROWS; r++) {
+      for (let c = 0; c <= COLS; c++) {
+        const x = c * cw;
+        const y = r * rh;
+        const wave = Math.sin(t * 0.001 + c * 0.4 + r * 0.5) * 0.5 + 0.5;
+        cx.beginPath();
+        cx.arc(x, y, 1.2, 0, Math.PI * 2);
+        cx.fillStyle = `rgba(6,182,212,${wave * 0.25})`;
+        cx.fill();
+      }
+    }
+    // Horizontal lines
+    for (let r = 0; r <= ROWS; r++) {
+      cx.beginPath();
+      cx.moveTo(0, r * rh);
+      cx.lineTo(W, r * rh);
+      cx.strokeStyle = 'rgba(6,182,212,0.04)';
+      cx.lineWidth = 1;
+      cx.stroke();
+    }
+    // Vertical lines
+    for (let c = 0; c <= COLS; c++) {
+      cx.beginPath();
+      cx.moveTo(c * cw, 0);
+      cx.lineTo(c * cw, H);
+      cx.stroke();
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ── SPINE FILL ON SCROLL ─────────────────────────────
+(function () {
+  const pipeline = document.getElementById('pipeline');
+  const fill     = document.getElementById('spine-fill');
+
+  function update() {
+    const r  = pipeline.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(100, (-r.top / (r.height - window.innerHeight)) * 100));
+    fill.style.height = pct + '%';
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+// ── STEP REVEAL ──────────────────────────────────────
+(function () {
+  const steps = document.querySelectorAll('.step');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.25 });
+  steps.forEach(s => io.observe(s));
+})();
+
+// ── GENERIC REVEAL ───────────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
