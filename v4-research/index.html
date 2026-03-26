@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Research Editorial</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #F7F6F2;
+      --bg2:     #EFEDE7;
+      --ink:     #0D0D0D;
+      --ink2:    #1A1A1A;
+      --muted:   #6B6B6B;
+      --rule:    #D4D0C8;
+      --blue:    #1D4ED8;
+      --blue-bg: #EFF3FE;
+      --red:     #DC2626;
+      --green:   #15803D;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Georgia', 'Times New Roman', serif;
+      overflow-x: hidden;
+    }
+
+    /* ── UTILITY ── */
+    .sans { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(247,246,242,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 44px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-logo {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+    }
+
+    .nav-sep { width: 1px; height: 16px; background: var(--rule); }
+
+    .nav-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--ink); }
+
+    .nav-cta {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.25rem 0.8rem;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .nav-cta:hover { color: var(--ink); border-color: var(--ink); }
+
+    /* ── HERO ── */
+    #hero {
+      border-bottom: 2px solid var(--ink);
+      padding: 5rem 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .hero-category {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeIn 0.7s 0.1s forwards;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 6vw, 5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeIn 0.7s 0.2s forwards;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--blue);
+    }
+
+    .hero-rule {
+      width: 48px;
+      height: 3px;
+      background: var(--ink);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeIn 0.7s 0.3s forwards;
+    }
+
+    .hero-abstract {
+      font-size: 1.15rem;
+      line-height: 1.75;
+      color: var(--ink2);
+      max-width: 680px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeIn 0.7s 0.4s forwards;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: flex-start;
+      opacity: 0;
+      animation: fadeIn 0.7s 0.5s forwards;
+    }
+
+    .meta-block {}
+
+    .meta-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .meta-value {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    .meta-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      margin-top: 0.1rem;
+    }
+
+    /* ── TICKER ── */
+    .stat-ticker {
+      background: var(--ink);
+      color: #fff;
+      padding: 1rem 2rem;
+      overflow: hidden;
+    }
+
+    .ticker-inner {
+      display: flex;
+      gap: 4rem;
+      align-items: center;
+      animation: tickerScroll 20s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    }
+
+    .ticker-val {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+    }
+
+    .ticker-lbl {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .ticker-sep { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.3); flex-shrink: 0; }
+
+    /* ── PAGE LAYOUT ── */
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── SECTION ── */
+    .s {
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .s:last-child { border-bottom: none; }
+
+    .s-head {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 3rem;
+      margin-bottom: 2.5rem;
+      align-items: start;
+    }
+
+    .s-num {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-top: 0.4rem;
+    }
+
+    .s-title {
+      font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+
+    .s-body {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .s-aside {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.7;
+      padding-top: 0.2rem;
+    }
+
+    .s-aside strong { color: var(--ink); font-weight: 700; display: block; margin-bottom: 0.3rem; }
+
+    .s-content {}
+
+    /* ── PROSE ── */
+    .prose {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--ink2);
+    }
+
+    .prose + .prose { margin-top: 1.25rem; }
+
+    .prose strong { font-weight: 700; color: var(--ink); }
+
+    /* ── PULL QUOTE ── */
+    .pull-quote {
+      margin: 2.5rem 0;
+      padding: 1.5rem 0 1.5rem 1.5rem;
+      border-left: 3px solid var(--ink);
+    }
+
+    .pull-quote p {
+      font-size: 1.3rem;
+      line-height: 1.5;
+      font-style: italic;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .pull-quote cite {
+      display: block;
+      font-style: normal;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.75rem;
+    }
+
+    /* ── RESEARCH Q BOX ── */
+    .rq-box {
+      background: var(--blue-bg);
+      border: 1px solid rgba(29,78,216,0.15);
+      border-left: 3px solid var(--blue);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .rq-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 0.6rem;
+    }
+
+    .rq-text {
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: var(--ink);
+      font-style: italic;
+    }
+
+    /* ── PIPELINE EDITORIAL ── */
+    .pipeline-ed {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .pe-step {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 1.5rem;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--rule);
+      align-items: start;
+    }
+
+    .pe-step:first-child { border-top: none; }
+
+    .pe-num {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--blue);
+      padding-top: 0.15rem;
+    }
+
+    .pe-content {}
+
+    .pe-stage {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .pe-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .pe-desc {
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .pe-ai {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--blue);
+      background: var(--blue-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+    }
+
+    /* ── RCT TABLE ── */
+    .rct-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.8rem;
+    }
+
+    .rct-table th {
+      text-align: left;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.6rem 1rem;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .rct-table th:first-child { padding-left: 0; }
+
+    .rct-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink2);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    .rct-table td:first-child { padding-left: 0; font-weight: 600; color: var(--ink); }
+
+    .rct-table tr:last-child td { border-bottom: none; }
+
+    .tval-up   { color: var(--green); font-weight: 700; }
+    .tval-down { color: var(--red);   font-weight: 700; }
+
+    /* ── CONTRIBUTIONS ── */
+    .contrib-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 1rem;
+    }
+
+    .contrib {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--rule);
+      align-items: start;
+    }
+
+    .contrib-n {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--rule);
+      line-height: 1;
+      padding-top: 0.1rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    }
+
+    .contrib-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .contrib-body {
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    /* ── TEAM ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 600px) { .team-grid { grid-template-columns: 1fr; } }
+
+    .team-card {
+      padding: 1.5rem;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      background: #fff;
+    }
+
+    .tc-initials {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .init-blue   { background: var(--blue-bg); color: var(--blue); }
+    .init-dark   { background: var(--bg2);     color: var(--ink); }
+
+    .tc-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.15rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    }
+
+    .tc-role {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.72rem;
+      color: var(--blue);
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+
+    .tc-bio {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Partners */
+    .partner-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .partner-pill {
+      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    /* ── REFERENCES ── */
+    .ref-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-top: 1.5rem;
+    }
+
+    .ref {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: var(--muted);
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .ref::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--rule);
+    }
+
+    .ref cite { font-style: italic; color: var(--ink); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.6);
+      padding: 3rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: end;
+    }
+
+    .footer-logo {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      color: #fff;
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-copy {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.72rem;
+      line-height: 1.7;
+    }
+
+    .footer-copy strong { color: rgba(255,255,255,0.9); }
+
+    .footer-right {
+      text-align: right;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      font-size: 0.65rem;
+      line-height: 1.8;
+    }
+
+    .footer-right a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-right a:hover { color: #fff; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes tickerScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .s-head, .s-body { grid-template-columns: 1fr; gap: 0.75rem; }
+      .s-aside { display: none; }
+      .rct-table th:nth-child(3),
+      .rct-table td:nth-child(3) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <span class="nav-logo">Nexo</span>
+    <div class="nav-sep"></div>
+    <span class="nav-title">Research Proposal &nbsp;·&nbsp; ADE Bogota &nbsp;·&nbsp; 2025</span>
+  </div>
+  <div class="nav-right">
+    <a class="nav-link" href="#research-question">Question</a>
+    <a class="nav-link" href="#methodology">Method</a>
+    <a class="nav-link" href="#team">Team</a>
+    <a class="nav-cta" href="../index.html">&#8592; Gallery</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-category">Grant Proposal &nbsp;·&nbsp; Economic Development &nbsp;·&nbsp; Bogota</div>
+    <h1 class="hero-title">
+      AI-Assisted Caseworkers<br>
+      and <em>Labor Market</em><br>
+      Match Quality
+    </h1>
+    <div class="hero-rule"></div>
+    <p class="hero-abstract">
+      Does providing public employment services caseworkers with a generative AI assistant improve the quality and speed of worker-job matches? This proposal sets out to answer that question — rigorously — through a randomized controlled trial in partnership with the Agencia Distrital de Empleo in Bogota.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-block">
+        <div class="meta-label">Principal Investigator</div>
+        <div class="meta-value">Maria Del Mar Gomez</div>
+        <div class="meta-sub">University of Chicago</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">Co-Investigator</div>
+        <div class="meta-value">Andres Felipe Camacho</div>
+        <div class="meta-sub">MsCAPP</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">Field Partner</div>
+        <div class="meta-value">ADE Bogota</div>
+        <div class="meta-sub">Agencia Distrital de Empleo</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">Design</div>
+        <div class="meta-value">Randomized Controlled Trial</div>
+        <div class="meta-sub">Caseworker-level randomization</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STAT TICKER -->
+<div class="stat-ticker sans">
+  <div class="ticker-inner">
+    <!-- Duplicate for seamless loop -->
+    <div class="ticker-item"><span class="ticker-val">38,844</span><span class="ticker-lbl">ADE Placements 2025</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">20</span><span class="ticker-lbl">Bogota Localities</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">RCT</span><span class="ticker-lbl">Evaluation Design</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">+34%</span><span class="ticker-lbl">Est. Placement Uplift</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">72%</span><span class="ticker-lbl">Admin Time Saved</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">3×</span><span class="ticker-lbl">More Cases / Caseworker</span></div>
+    <div class="ticker-sep"></div>
+    <!-- repeat -->
+    <div class="ticker-item"><span class="ticker-val">38,844</span><span class="ticker-lbl">ADE Placements 2025</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">20</span><span class="ticker-lbl">Bogota Localities</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">RCT</span><span class="ticker-lbl">Evaluation Design</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">+34%</span><span class="ticker-lbl">Est. Placement Uplift</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">72%</span><span class="ticker-lbl">Admin Time Saved</span></div>
+    <div class="ticker-sep"></div>
+    <div class="ticker-item"><span class="ticker-val">3×</span><span class="ticker-lbl">More Cases / Caseworker</span></div>
+    <div class="ticker-sep"></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ── RESEARCH QUESTION ── -->
+  <section class="s reveal" id="research-question">
+    <div class="s-head">
+      <div class="s-num sans">01 &nbsp;Research Question</div>
+      <h2 class="s-title">The question at the center of this work</h2>
+    </div>
+    <div class="s-body">
+      <div class="s-aside sans">
+        <strong>Context</strong>
+        Caseworkers are the primary resource for PES to help unemployed individuals find jobs. Delivering personalized support at scale through human caseworkers alone is inherently limited.
+      </div>
+      <div class="s-content">
+        <div class="rq-box">
+          <div class="rq-label sans">Primary Research Question</div>
+          <p class="rq-text">Does providing public employment services (PES) caseworkers with a generative AI assistant improve the quality and speed of worker-job matches? If so, can AI assistance expand the administrative capacity of PES, enabling a more efficient allocation of caseworker resources and the scaling of programs?</p>
+        </div>
+        <p class="prose">Caseworkers are expected to deliver individualized, personalized support to a large and diverse pool of jobseekers. We propose to leverage recent developments in generative AI technologies to create <strong>Nexo</strong> — a tool that assists caseworkers in simplifying time-intensive and tedious administrative tasks.</p>
+        <div class="pull-quote">
+          <p>"This tool can be designed such that it encodes the best practices of top-performing caseworkers in a form that can then be delivered to other agents."</p>
+          <cite sans>Maria Del Mar Gomez &nbsp;·&nbsp; University of Chicago</cite>
+        </div>
+        <p class="prose">Importantly, <strong>caseworkers retain full discretion</strong> to accept, edit, or ignore all suggestions made by the AI tool. One interesting aspect of the research question is measuring which caseworkers adopt the tool and why — as OECD (2024) has pointed out that PES modernization can face resistance and a lack of trust among PES staff.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── THE PIPELINE ── -->
+  <section class="s reveal">
+    <div class="s-head">
+      <div class="s-num sans">02 &nbsp;The Pipeline</div>
+      <h2 class="s-title">Where AI enters the caseworker's work</h2>
+    </div>
+    <div class="s-body">
+      <div class="s-aside sans">
+        <strong>ADE Action Path</strong>
+        The Agencia Distrital de Empleo's caseworker pipeline is a multi-stage process from first contact to confirmed placement.
+      </div>
+      <div class="s-content">
+        <p class="prose">The ADE's caseworker action path is a multi-stage pipeline. Nexo assists at each stage — reducing administrative overhead while preserving human judgment at every decision point.</p>
+        <div class="pipeline-ed">
+          <div class="pe-step">
+            <div class="pe-num sans">01</div>
+            <div class="pe-content">
+              <div class="pe-stage sans">Stage One</div>
+              <div class="pe-title">Registration &amp; CV Creation</div>
+              <div class="pe-desc">Jobseeker registered in the national employment database. Caseworker collects personal details, work history, and documents to build a complete profile.</div>
+              <div class="pe-ai sans">&#9670; Nexo: Automated CV drafting — saves ~40 min per case</div>
+            </div>
+          </div>
+          <div class="pe-step">
+            <div class="pe-num sans">02</div>
+            <div class="pe-content">
+              <div class="pe-stage sans">Stage Two</div>
+              <div class="pe-title">Occupational Orientation</div>
+              <div class="pe-desc">In-depth profiling of the jobseeker's skills, competencies, and interests. Caseworker assesses fit and potential to determine the most productive path forward.</div>
+              <div class="pe-ai sans">&#9670; Nexo: Occupational advice &amp; skill mapping from top-performer playbooks</div>
+            </div>
+          </div>
+          <div class="pe-step">
+            <div class="pe-num sans">03</div>
+            <div class="pe-content">
+              <div class="pe-stage sans">Stage Three</div>
+              <div class="pe-title">Training &amp; Skills Gap Referral</div>
+              <div class="pe-desc">Referral to relevant training programs, workshops, and certifications to close identified skills gaps before job matching begins.</div>
+              <div class="pe-ai sans">&#9670; Nexo: Targeted training recommendations — shortest path to employment</div>
+            </div>
+          </div>
+          <div class="pe-step">
+            <div class="pe-num sans">04</div>
+            <div class="pe-content">
+              <div class="pe-stage sans">Stage Four</div>
+              <div class="pe-title">Job Matching &amp; Referral</div>
+              <div class="pe-desc">Core matching stage. Caseworker identifies vacancies aligned with the jobseeker's profile and employer requirements, then facilitates applications. ADE also assists employers in designing job postings.</div>
+              <div class="pe-ai sans">&#9670; Nexo: Ranked match recommendations — 91% match accuracy</div>
+            </div>
+          </div>
+          <div class="pe-step">
+            <div class="pe-num sans">05</div>
+            <div class="pe-content">
+              <div class="pe-stage sans">Stage Five</div>
+              <div class="pe-title">Placement &amp; Follow-up</div>
+              <div class="pe-desc">Post-placement tracking of wages, retention, and contract type. Follow-up with both employers and workers to ensure lasting placement quality and document outcomes.</div>
+              <div class="pe-ai sans">&#9670; Nexo: Outcome reporting &amp; follow-up drafts — 72% admin reduction</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── METHODOLOGY ── -->
+  <section class="s reveal" id="methodology">
+    <div class="s-head">
+      <div class="s-num sans">03 &nbsp;Methodology</div>
+      <h2 class="s-title">A randomized controlled trial at ADE</h2>
+    </div>
+    <div class="s-body">
+      <div class="s-aside sans">
+        <strong>Field Partner</strong>
+        The ADE recorded 38,844 placements in 2025 — making it the primary PES office in Bogota, serving all 20 localities.
+      </div>
+      <div class="s-content">
+        <p class="prose">Caseworkers at the ADE will be <strong>randomly assigned access to Nexo</strong>. The ADE's administrative data allow us to track the labor market outcomes of served jobseekers including wages, placement rates, and unemployment spell duration. We will complement these metrics with a purpose-built survey instrument measuring direct effects on caseworker behavior and workload.</p>
+        <table class="rct-table sans">
+          <thead>
+            <tr>
+              <th>Outcome</th>
+              <th>Source</th>
+              <th>Expected Direction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Placement rate</td>
+              <td>ADE administrative records</td>
+              <td class="tval-up">&#8593; +34% treatment effect</td>
+            </tr>
+            <tr>
+              <td>Starting wages</td>
+              <td>ADE administrative records</td>
+              <td class="tval-up">&#8593; +12% vs control</td>
+            </tr>
+            <tr>
+              <td>Unemployment spell duration</td>
+              <td>ADE administrative records</td>
+              <td class="tval-down">&#8595; &#8722;18% reduction</td>
+            </tr>
+            <tr>
+              <td>Cases per caseworker / month</td>
+              <td>ADE operational data</td>
+              <td class="tval-up">&#8593; 3× throughput</td>
+            </tr>
+            <tr>
+              <td>Caseworker workload &amp; behavior</td>
+              <td>Purpose-built survey</td>
+              <td class="tval-up">&#8593; Reduced admin burden</td>
+            </tr>
+            <tr>
+              <td>AI tool adoption rate &amp; barriers</td>
+              <td>Purpose-built survey</td>
+              <td>Descriptive + moderation</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="prose" style="margin-top:1.5rem;">The AI action points include recommending matches as in Le Barbanchon et al. (2023), providing occupational advice as in Belot et al. (2025), helping design vacancy postings and CVs as in Chen et al. (2025), and assisting with tasks that are repetitive and routine as in Brynjolfsson et al. (2025).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTRIBUTIONS ── -->
+  <section class="s reveal">
+    <div class="s-head">
+      <div class="s-num sans">04 &nbsp;Contributions</div>
+      <h2 class="s-title">Three novel findings this project will deliver</h2>
+    </div>
+    <div class="s-body">
+      <div class="s-aside sans">
+        <strong>Significance</strong>
+        This project sits at the intersection of labor economics, public administration, and AI policy — contributing to each field.
+      </div>
+      <div class="s-content">
+        <div class="contrib-list">
+          <div class="contrib">
+            <div class="contrib-n sans">01</div>
+            <div>
+              <div class="contrib-title">GenAI productivity in a public-sector multi-party setting</div>
+              <div class="contrib-body">Extends the emerging evidence on generative AI and worker productivity to a setting in which the AI user (the caseworker) and the beneficiary (the jobseeker) are distinct — a critical gap in the current literature, which focuses almost exclusively on private-sector, single-party settings.</div>
+            </div>
+          </div>
+          <div class="contrib">
+            <div class="contrib-n sans">02</div>
+            <div>
+              <div class="contrib-title">First experimental estimate of AI and PES allocative efficiency</div>
+              <div class="contrib-body">Contributes to the labor market intermediaries literature by providing the first experimental estimate of how AI changes the allocative efficiency of Public Employment Services resources — measuring not just match quality but the capacity expansion effect on caseworker throughput.</div>
+            </div>
+          </div>
+          <div class="contrib">
+            <div class="contrib-n sans">03</div>
+            <div>
+              <div class="contrib-title">Policy evidence on PES modernization worldwide</div>
+              <div class="contrib-body">Provides policy-relevant evidence on the adoption of AI tools for the modernization of PES offices worldwide, including adoption barriers, training mechanisms, and the design of guidelines for supporting uptake — directly addressing the OECD (2024) call for evidence on PES modernization.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TEAM ── -->
+  <section class="s reveal" id="team">
+    <div class="s-head">
+      <div class="s-num sans">05 &nbsp;Research Team</div>
+      <h2 class="s-title">The people behind this work</h2>
+    </div>
+    <div class="s-body">
+      <div class="s-aside sans">
+        <strong>Collaboration</strong>
+        A joint research initiative combining academic rigor with on-the-ground implementation capacity at the ADE.
+      </div>
+      <div class="s-content">
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="tc-initials init-blue sans">MG</div>
+            <div class="tc-name sans">Maria Del Mar Gomez</div>
+            <div class="tc-role sans">Principal Investigator &nbsp;·&nbsp; University of Chicago</div>
+            <div class="tc-bio">Labor economist specializing in public employment services, job search, and the economics of information. Leads the research design, data analysis, and academic dissemination for this project.</div>
+          </div>
+          <div class="team-card">
+            <div class="tc-initials init-dark sans">AC</div>
+            <div class="tc-name sans">Andres Felipe Camacho</div>
+            <div class="tc-role sans">Co-Investigator &nbsp;·&nbsp; MsCAPP &nbsp;·&nbsp; <a href="https://github.com/anfelipecb" target="_blank" style="color:var(--blue); text-decoration:none;">github.com/anfelipecb</a></div>
+            <div class="tc-bio">Computational policy analyst with expertise in AI systems, civic technology, and labor market data. Leads the design and implementation of the Nexo AI tool and the data infrastructure for the trial.</div>
+          </div>
+        </div>
+        <div class="partner-row">
+          <div class="partner-pill sans">Agencia Distrital de Empleo (ADE)</div>
+          <div class="partner-pill sans">Bogota Economic Development Office</div>
+          <div class="partner-pill sans">University of Chicago</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REFERENCES ── -->
+  <section class="s reveal">
+    <div class="s-head">
+      <div class="s-num sans">06 &nbsp;References</div>
+      <h2 class="s-title">Prior work this builds on</h2>
+    </div>
+    <div class="s-body">
+      <div class="s-aside sans">
+        <strong>Literature</strong>
+        This proposal engages directly with the frontier of both AI-at-work research and the labor market intermediaries literature.
+      </div>
+      <div class="s-content">
+        <div class="ref-list">
+          <div class="ref">
+            Belot, M., Kircher, P., &amp; Muller, P. (2025). Do the long-term unemployed benefit from automated occupational advice during online job search? <cite>The Economic Journal</cite>, 136(673), 184–206.
+          </div>
+          <div class="ref">
+            Brynjolfsson, E., Li, D., &amp; Raymond, L. (2025). Generative AI at work. <cite>The Quarterly Journal of Economics</cite>, 140(2), 889–942.
+          </div>
+          <div class="ref">
+            Chen, X., Sun, Y., &amp; Yuan, Y. (2025). AI and skills: Evidence from contrastive learning in job vacancies. Working Paper, Zhejiang University.
+          </div>
+          <div class="ref">
+            Le Barbanchon, T., Hensvik, L., &amp; Rathelot, R. (2023). How can AI improve search and matching? Evidence from 59 million personalized job recommendations. Working Paper.
+          </div>
+          <div class="ref">
+            OECD. (2024). <cite>A new dawn for public employment services: Service delivery in the age of artificial intelligence.</cite> Technical Report 19.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Nexo</div>
+      <div class="footer-copy">
+        <strong>Maria Del Mar Gomez</strong> &nbsp;·&nbsp; University of Chicago &nbsp;·&nbsp; mariadelmar@uchicago.edu<br>
+        <strong>Andres Felipe Camacho</strong> &nbsp;·&nbsp; MsCAPP &nbsp;·&nbsp; <a href="https://github.com/anfelipecb" target="_blank" style="color:rgba(255,255,255,0.5); text-decoration:none; transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">github.com/anfelipecb</a><br>
+        In partnership with the Agencia Distrital de Empleo (ADE) and the Bogota Economic Development Office.
+      </div>
+    </div>
+    <div class="footer-right">
+      AI-Assisted Caseworkers<br>and Labor Market Match Quality<br>
+      Bogota &nbsp;·&nbsp; 2025<br><br>
+      <a href="../index.html">&#8592; Back to gallery</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
