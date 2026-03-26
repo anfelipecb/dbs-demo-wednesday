@@ -11,12 +11,11 @@ GitHub: **https://github.com/anfelipecb/dbs-demo-wednesday**
 
 ---
 
-## Authors
+## Author
 
-**Andres Felipe Camacho** (first author) · MsCAPP · https://github.com/anfelipecb
-**Maria Del Mar Gomez** (co-investigator) · University of Chicago · mariadelmar@uchicago.edu
+**Andres Felipe Camacho** · MsCAPP · https://github.com/anfelipecb
 
-Andres always appears first in every author byline, footer, and team section. Maria Del Mar second.
+This is a solo prototype. No co-authors appear on any page.
 
 ---
 

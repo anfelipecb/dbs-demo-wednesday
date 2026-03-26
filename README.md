@@ -1,9 +1,6 @@
 # Nexo — AI-Assisted Caseworkers & Labor Market Match Quality
 
 **Andres Felipe Camacho**, MsCAPP · [github.com/anfelipecb](https://github.com/anfelipecb)
-**Maria Del Mar Gomez**, University of Chicago · mariadelmar@uchicago.edu
-
-In partnership with the **Agencia Distrital de Empleo (ADE)** and the **Bogota Economic Development Office**.
 
 ---
 
