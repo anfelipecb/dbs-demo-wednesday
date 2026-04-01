@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Cinematic</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #050505;
+      --text: #F5F5F5;
+      --muted: #777;
+      --cyan: #06B6D4;
+      --violet: #8B5CF6;
+      --amber: #F59E0B;
+      --emerald: #10B981;
+      --rose: #F43F5E;
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .back {
+      position: fixed;
+      top: 1.2rem;
+      left: 1.2rem;
+      z-index: 200;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 99px;
+      backdrop-filter: blur(12px);
+      background: rgba(0,0,0,0.3);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .back:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+    /* ── SECTION BASE ── */
+    .frame {
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding: 2rem;
+      transition: background-color 1s ease;
+    }
+
+    /* ── FRAME 1: TITLE ── */
+    .f-title {
+      background: #050505;
+    }
+
+    .logo {
+      font-size: clamp(7rem, 22vw, 18rem);
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      line-height: 0.85;
+      background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.15) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: clamp(0.85rem, 1.8vw, 1.2rem);
+      color: var(--muted);
+      margin-top: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      max-width: 500px;
+    }
+
+    .tagline strong { color: #fff; font-weight: 500; }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      animation: pulse-opacity 2s ease-in-out infinite;
+    }
+
+    /* ── FRAME 2: THE PROBLEM ── */
+    .f-problem {
+      background: #050505;
+    }
+
+    .big-number {
+      font-size: clamp(5rem, 18vw, 16rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 0.9;
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .problem-text {
+      font-size: clamp(1rem, 2.5vw, 1.6rem);
+      color: var(--muted);
+      margin-top: 1rem;
+      max-width: 550px;
+      line-height: 1.5;
+    }
+
+    .problem-text strong { color: var(--text); }
+
+    /* ── FRAME 3: BOTTLENECK ── */
+    .f-bottleneck {
+      background: #070A12;
+    }
+
+    .bottleneck-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 2rem;
+    }
+
+    .bn-stages {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .bn-stage {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .bn-stage.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .bn-stage:last-child { border-bottom: none; }
+
+    .bn-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .bn-time {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--rose);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .bn-total {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 2px solid rgba(244,63,94,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .bn-total .bn-name { color: var(--rose); font-weight: 700; }
+    .bn-total .bn-time { font-size: 1rem; }
+
+    /* ── FRAME 4: THE QUESTION ── */
+    .f-question {
+      background: linear-gradient(180deg, #070A12 0%, #0A0520 100%);
+    }
+
+    .question-text {
+      font-size: clamp(1.8rem, 5vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      max-width: 800px;
+    }
+
+    .question-text .highlight {
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .question-sub {
+      font-size: clamp(0.8rem, 1.5vw, 1rem);
+      color: var(--muted);
+      margin-top: 1.5rem;
+      max-width: 450px;
+      line-height: 1.6;
+    }
+
+    /* ── FRAME 5: HOW IT WORKS ── */
+    .f-how {
+      background: #0A0520;
+    }
+
+    .how-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 3rem;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    @media (max-width: 600px) { .how-grid { grid-template-columns: 1fr; gap: 2rem; } }
+
+    .how-item {
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+
+    .how-item.show { opacity: 1; transform: translateY(0); }
+
+    .how-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .how-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .how-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .how-chip {
+      display: inline-block;
+      margin-top: 0.6rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      border: 1px solid;
+    }
+
+    .chip-cyan   { color: var(--cyan);   border-color: rgba(6,182,212,0.3); }
+    .chip-violet { color: #C4B5FD;       border-color: rgba(139,92,246,0.3); }
+    .chip-amber  { color: #FCD34D;       border-color: rgba(245,158,11,0.3); }
+
+    /* ── FRAME 6: THE NUMBERS ── */
+    .f-numbers {
+      background: linear-gradient(180deg, #0A0520 0%, #051210 100%);
+    }
+
+    .numbers-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--emerald);
+      margin-bottom: 3rem;
+    }
+
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4rem;
+    }
+
+    .stat {
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .stat.show { opacity: 1; transform: scale(1); }
+
+    .stat-val {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .sv-cyan   { color: var(--cyan); }
+    .sv-violet { color: var(--violet); }
+    .sv-amber  { color: var(--amber); }
+    .sv-emerald { color: var(--emerald); }
+
+    .stat-lbl {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+    }
+
+    /* ── FRAME 7: THE METHOD ── */
+    .f-method {
+      background: #051210;
+    }
+
+    .method-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 2rem;
+    }
+
+    .method-statement {
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      max-width: 650px;
+      margin-bottom: 3rem;
+    }
+
+    .method-split {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      max-width: 600px;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    @media (max-width: 500px) {
+      .method-split { grid-template-columns: 1fr; gap: 1rem; }
+      .method-divider { display: none; }
+    }
+
+    .method-arm {
+      padding: 1.5rem;
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    .arm-a {
+      background: rgba(6,182,212,0.08);
+      border: 1px solid rgba(6,182,212,0.2);
+    }
+
+    .arm-b {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .arm-tag {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .arm-a .arm-tag { color: var(--cyan); }
+    .arm-b .arm-tag { color: var(--muted); }
+
+    .arm-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .arm-desc {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .method-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1.5rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.15);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── FRAME 8: CLOSE ── */
+    .f-close {
+      background: linear-gradient(180deg, #051210 0%, #050505 100%);
+    }
+
+    .close-logo {
+      font-size: clamp(4rem, 12vw, 9rem);
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      line-height: 0.85;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1.5rem;
+    }
+
+    .close-sub {
+      font-size: clamp(0.85rem, 2vw, 1.15rem);
+      color: var(--muted);
+      max-width: 420px;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .close-author {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .close-role {
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    .close-role a {
+      color: var(--cyan);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .close-role a:hover { opacity: 0.7; }
+
+    /* ── PROGRESS BAR ── */
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--violet), var(--amber), var(--emerald));
+      width: 0%;
+      z-index: 200;
+      transition: width 0.15s linear;
+    }
+
+    /* ── SECTION COUNTER ── */
+    #counter {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 200;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes pulse-opacity {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.6; }
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.8s, transform 0.8s;
+    }
+
+    .fade-in.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered children */
+    .stagger > * { transition-delay: calc(var(--i, 0) * 0.1s); }
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">&#8592; Gallery</a>
+<div id="progress"></div>
+<div id="counter">01 / 08</div>
+
+<!-- ═══ 1. TITLE ═══ -->
+<section class="frame f-title" data-n="1">
+  <div class="logo">Nexo</div>
+  <p class="tagline"><strong>AI copilot for employment caseworkers.</strong> Amplifying Bogota's public employment services at city scale.</p>
+  <div class="scroll-hint">Scroll</div>
+</section>
+
+<!-- ═══ 2. THE PROBLEM ═══ -->
+<section class="frame f-problem" data-n="2">
+  <div class="big-number fade-in">38,844</div>
+  <p class="problem-text fade-in">workers placed in 2025 by the Agencia Distrital de Empleo. <strong>One caseworker at a time.</strong></p>
+</section>
+
+<!-- ═══ 3. BOTTLENECK ═══ -->
+<section class="frame f-bottleneck" data-n="3">
+  <div class="bottleneck-label">The bottleneck</div>
+  <div class="bn-stages">
+    <div class="bn-stage"><span class="bn-name">Registration &amp; CV</span><span class="bn-time">45 min</span></div>
+    <div class="bn-stage"><span class="bn-name">Occupational orientation</span><span class="bn-time">60 min</span></div>
+    <div class="bn-stage"><span class="bn-name">Training referral</span><span class="bn-time">30 min</span></div>
+    <div class="bn-stage"><span class="bn-name">Job matching</span><span class="bn-time">90 min</span></div>
+    <div class="bn-stage"><span class="bn-name">Placement follow-up</span><span class="bn-time">40 min</span></div>
+  </div>
+  <div class="bn-total">
+    <span class="bn-name">Per jobseeker total</span>
+    <span class="bn-time">4.4 hours</span>
+  </div>
+</section>
+
+<!-- ═══ 4. THE QUESTION ═══ -->
+<section class="frame f-question" data-n="4">
+  <h2 class="question-text fade-in">What if every caseworker had an <span class="highlight">AI copilot?</span></h2>
+  <p class="question-sub fade-in">AI suggests. Caseworkers decide. Every suggestion can be accepted, edited, or ignored.</p>
+</section>
+
+<!-- ═══ 5. HOW IT WORKS ═══ -->
+<section class="frame f-how" data-n="5">
+  <div class="how-label">What Nexo does</div>
+  <div class="how-grid">
+    <div class="how-item">
+      <span class="how-icon">&#9998;</span>
+      <div class="how-title">Drafts CVs</div>
+      <div class="how-desc">Generates structured, employer-ready CVs from raw jobseeker information in seconds.</div>
+      <div class="how-chip chip-cyan">&#8722;55% time</div>
+    </div>
+    <div class="how-item">
+      <span class="how-icon">&#9670;</span>
+      <div class="how-title">Matches jobs</div>
+      <div class="how-desc">Ranks vacancies by fit using skill profiling, experience, and employer requirements.</div>
+      <div class="how-chip chip-violet">91% accuracy</div>
+    </div>
+    <div class="how-item">
+      <span class="how-icon">&#9881;</span>
+      <div class="how-title">Automates admin</div>
+      <div class="how-desc">Handles follow-ups, outcome reports, and routine documentation automatically.</div>
+      <div class="how-chip chip-amber">&#8722;72% admin</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 6. THE NUMBERS ═══ -->
+<section class="frame f-numbers" data-n="6">
+  <div class="numbers-label">Projected impact</div>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-val sv-cyan">+34%</div>
+      <div class="stat-lbl">Placement rate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val sv-violet">&#8722;18%</div>
+      <div class="stat-lbl">Unemployment spell</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val sv-emerald">3&times;</div>
+      <div class="stat-lbl">Cases per worker</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val sv-amber">+12%</div>
+      <div class="stat-lbl">Starting wages</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 7. THE METHOD ═══ -->
+<section class="frame f-method" data-n="7">
+  <div class="method-label">How we prove it</div>
+  <p class="method-statement fade-in">A randomized controlled trial. Caseworkers randomly assigned to Nexo — outcomes tracked through ADE administrative records.</p>
+  <div class="method-split fade-in">
+    <div class="method-arm arm-a">
+      <div class="arm-tag">Treatment</div>
+      <div class="arm-title">Nexo AI Copilot</div>
+      <div class="arm-desc">Full access to CV drafting, skill profiling, match recommendations, and admin automation.</div>
+    </div>
+    <div class="method-divider">VS</div>
+    <div class="method-arm arm-b">
+      <div class="arm-tag">Control</div>
+      <div class="arm-title">Standard Workflow</div>
+      <div class="arm-desc">Same jobseekers, same outcomes tracked. Isolating the causal effect of AI access.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 8. CLOSE ═══ -->
+<section class="frame f-close" data-n="8">
+  <div class="close-logo">Nexo</div>
+  <p class="close-sub">Empowering every caseworker with AI. Measuring the impact with science.</p>
+  <div class="close-author">Andres Felipe Camacho &nbsp;·&nbsp; MsCAPP</div>
+  <div class="close-role"><a href="https://github.com/anfelipecb" target="_blank">github.com/anfelipecb</a></div>
+</section>
+
+<script>
+// ── PROGRESS BAR + COUNTER ──
+const bar = document.getElementById('progress');
+const counter = document.getElementById('counter');
+const frames = document.querySelectorAll('.frame');
+const total = frames.length;
+
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  bar.style.width = pct + '%';
+
+  // Find current frame
+  let current = 1;
+  frames.forEach((f, i) => {
+    const rect = f.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.5) current = i + 1;
+  });
+  counter.textContent = String(current).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+}
+
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+// ── INTERSECTION OBSERVER ──
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      // Show fade-in elements
+      e.target.querySelectorAll('.fade-in').forEach((el, i) => {
+        setTimeout(() => el.classList.add('show'), i * 150);
+      });
+      // Show bottleneck stages with stagger
+      e.target.querySelectorAll('.bn-stage').forEach((el, i) => {
+        setTimeout(() => el.classList.add('show'), i * 120);
+      });
+      // Show how items
+      e.target.querySelectorAll('.how-item').forEach((el, i) => {
+        setTimeout(() => el.classList.add('show'), 200 + i * 200);
+      });
+      // Show stats
+      e.target.querySelectorAll('.stat').forEach((el, i) => {
+        setTimeout(() => el.classList.add('show'), i * 150);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+frames.forEach(f => io.observe(f));
+</script>
+</body>
+</html>
