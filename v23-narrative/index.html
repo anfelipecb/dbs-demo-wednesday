@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Narrative Teardown</title>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;overflow-x:hidden;background:#030712;color:#F1F5F9}
+    a{text-decoration:none}
+    .back{position:fixed;top:1rem;left:1rem;z-index:200;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:.3rem .7rem;border-radius:99px;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.4)}.back:hover{color:#fff}
+    #progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#06B6D4,#8B5CF6,#E8634A,#10B981);width:0%;z-index:200}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s,transform .7s}.reveal.in{opacity:1;transform:translateY(0)}
+
+    /* ════════ 1. HERO ════════ */
+    .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 20%,rgba(6,182,212,.12),transparent 60%),radial-gradient(ellipse 50% 40% at 70% 80%,rgba(139,92,246,.08),transparent 60%)}
+    .h-logo{font-size:clamp(7rem,20vw,16rem);font-weight:900;letter-spacing:-.06em;line-height:.85;background:linear-gradient(180deg,#fff 30%,rgba(255,255,255,.08));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+    .h-sub{font-size:clamp(.9rem,2vw,1.15rem);color:#64748B;margin-top:1.5rem;max-width:460px;position:relative}.h-sub strong{color:#F1F5F9;font-weight:500}
+    .h-stats{display:flex;gap:2.5rem;margin-top:2.5rem;position:relative}
+    .hs{text-align:center}.hs .v{font-size:1.8rem;font-weight:800;letter-spacing:-.04em;background:linear-gradient(135deg,#06B6D4,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hs .l{font-size:.58rem;color:#64748B;text-transform:uppercase;letter-spacing:.08em;margin-top:.1rem}
+    .hs-sep{width:1px;height:2.5rem;background:rgba(255,255,255,.08);align-self:center}
+    .scroll-cue{position:absolute;bottom:2.5rem;font-size:.55rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.15);animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:.15}50%{opacity:.5}}
+
+    /* ════════ 2. NARRATIVE TEARDOWN ════════ */
+    #teardown{height:600vh;position:relative}
+    .td-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;perspective:1400px;perspective-origin:50% 50%}
+    .td-sticky::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(139,92,246,.04),transparent 60%)}
+    .td-phase{position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);text-align:center;transition:opacity .3s}
+    .td-phase-title{font-size:1.1rem;font-weight:700;letter-spacing:-.02em}
+    .td-phase-sub{font-size:.7rem;color:#64748B;margin-top:.3rem}
+
+    .stage{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d}
+
+    /* Jobseeker profiles */
+    .js-profile{position:absolute;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:2px solid;will-change:transform,opacity;opacity:0;transition:none}
+    .js-label{position:absolute;bottom:-18px;font-size:.42rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+
+    /* Caseworker (center) */
+    .cw-card{position:absolute;width:200px;padding:1.2rem;border-radius:16px;text-align:center;will-change:transform,opacity;opacity:0;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.18);backdrop-filter:blur(16px)}
+    .cw-ico{font-size:1.8rem;margin-bottom:.4rem}
+    .cw-name{font-size:.85rem;font-weight:700;margin-bottom:.15rem}
+    .cw-role{font-size:.55rem;color:#64748B}
+    .cw-burden{margin-top:.6rem;font-size:.6rem;font-weight:700;color:#F43F5E;opacity:0;transition:opacity .5s}
+    .cw-burden.show{opacity:1}
+
+    /* Manual process indicators */
+    .manual-lines{position:absolute;width:100%;height:100%;pointer-events:none}
+    .manual-line{position:absolute;height:1px;background:rgba(244,63,94,.3);transform-origin:left;transform:scaleX(0);transition:transform .8s}
+
+    /* Nexo solution card */
+    .nexo-card{position:absolute;width:220px;padding:1.3rem;border-radius:18px;text-align:center;will-change:transform,opacity;opacity:0;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);backdrop-filter:blur(20px)}
+    .nx-glow{position:absolute;inset:-20px;border-radius:30px;background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%);opacity:0;transition:opacity .8s;pointer-events:none}
+    .nx-ico{font-size:1.8rem;margin-bottom:.4rem;position:relative}
+    .nx-name{font-size:.95rem;font-weight:800;margin-bottom:.15rem;position:relative}
+    .nx-role{font-size:.55rem;color:#A78BFA;position:relative}
+
+    /* Teardown capability cards (explode from Nexo) */
+    .cap-card{position:absolute;width:160px;padding:.9rem;border-radius:14px;backdrop-filter:blur(16px);text-align:left;will-change:transform,opacity;opacity:0;border:1px solid rgba(139,92,246,.2);background:rgba(139,92,246,.06)}
+    .cap-ico{font-size:1rem;margin-bottom:.3rem}
+    .cap-name{font-size:.72rem;font-weight:700;margin-bottom:.15rem}
+    .cap-stat{font-size:.55rem;font-weight:700;color:#A78BFA}
+    .cap-desc{font-size:.5rem;color:#64748B;line-height:1.4;margin-top:.2rem}
+
+    /* ════════ 3. WARM PIPELINE (V2-style spine) ════════ */
+    .warm-pipe{background:#FFF9F4;color:#1A1612;padding:5rem 0;position:relative;overflow:hidden}
+    .warm-pipe .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.3;pointer-events:none}
+    .wp-container{max-width:850px;margin:0 auto;padding:0 2rem}
+    .wp-header{text-align:center;margin-bottom:4rem}
+    .wp-tag{font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#E8634A;margin-bottom:.75rem}
+    .wp-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:.75rem}
+    .wp-sub{font-size:.9rem;color:#8B7E72;max-width:480px;margin:0 auto;line-height:1.7}.wp-sub strong{color:#1A1612}
+
+    .spine-wrap{position:relative}
+    .spine{position:absolute;left:50%;top:0;bottom:0;width:2px;background:#F0E6D8;transform:translateX(-50%)}
+    .spine-fill{position:absolute;top:0;left:0;width:100%;background:linear-gradient(to bottom,#E8634A,#1A8B7C);height:0%;transition:height .1s linear}
+    .steps{display:flex;flex-direction:column;gap:0}
+    .step{display:grid;grid-template-columns:1fr 56px 1fr;align-items:start;padding:2rem 0;position:relative;opacity:0;transform:translateY(15px);transition:opacity .5s,transform .5s}
+    .step.show{opacity:1;transform:translateY(0)}
+
+    .step:nth-child(odd) .step-card{grid-column:1}
+    .step:nth-child(odd) .step-node{grid-column:2}
+    .step:nth-child(odd) .step-ai{grid-column:3}
+    .step:nth-child(even) .step-card{grid-column:3;grid-row:1}
+    .step:nth-child(even) .step-node{grid-column:2;grid-row:1}
+    .step:nth-child(even) .step-ai{grid-column:1;grid-row:1}
+
+    .step-node{display:flex;align-items:flex-start;justify-content:center;padding-top:1rem;position:relative;z-index:1}
+    .node-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;position:relative;background:#fff;border:2px solid #F0E6D8;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:border-color .5s,box-shadow .5s}
+    .step.show .node-dot{border-color:#E8634A;box-shadow:0 0 12px rgba(232,99,74,.2)}
+    .node-num{color:#E8634A}
+
+    .step-card{padding:1.2rem;background:#fff;border-radius:14px;border:1px solid #F0E6D8;box-shadow:0 2px 6px rgba(0,0,0,.02);margin:0 .5rem}
+    .step:nth-child(odd) .step-card{margin-right:0;text-align:right}
+    .step:nth-child(even) .step-card{margin-left:0}
+    .sc-stage{font-size:.5rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8B7E72;margin-bottom:.15rem}
+    .sc-name{font-size:.9rem;font-weight:700;letter-spacing:-.01em;color:#1A1612;margin-bottom:.25rem}
+    .sc-desc{font-size:.68rem;color:#8B7E72;line-height:1.5}
+
+    .step-ai{padding:1rem;background:#FEEEE3;border-radius:12px;border:1px solid rgba(232,99,74,.15);margin:.2rem .5rem 0;text-align:center}
+    .step:nth-child(odd) .step-ai{margin-left:0}
+    .step:nth-child(even) .step-ai{margin-right:0}
+    .ai-label{font-size:.48rem;font-weight:700;color:#E8634A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;display:flex;align-items:center;justify-content:center;gap:.3rem}
+    .ai-dot{width:5px;height:5px;border-radius:50%;background:#E8634A;animation:aidot 1.5s ease-in-out infinite}
+    @keyframes aidot{0%,100%{opacity:1}50%{opacity:.3}}
+    .ai-action{font-size:.72rem;font-weight:700;color:#1A1612}.ai-chip{font-size:.55rem;font-weight:700;color:#E8634A;margin-top:.3rem}
+
+    @media(max-width:700px){
+      .step{grid-template-columns:36px 1fr}
+      .step:nth-child(odd) .step-card,.step:nth-child(even) .step-card{grid-column:2;grid-row:1;margin:0;text-align:left}
+      .step:nth-child(odd) .step-node,.step:nth-child(even) .step-node{grid-column:1;grid-row:1}
+      .step:nth-child(odd) .step-ai,.step:nth-child(even) .step-ai{grid-column:2;grid-row:2;margin:.5rem 0 0}
+      .spine{left:18px}
+    }
+
+    /* ════════ 4. RCT METHODOLOGY (full page) ════════ */
+    .rct-page{min-height:100vh;background:#F7F6F2;color:#111;display:flex;align-items:center;justify-content:center;padding:4rem 2rem;position:relative;overflow:hidden}
+    .rct-inner{max-width:800px;width:100%;text-align:center}
+    .rct-tag{font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#1D4ED8;margin-bottom:.75rem}
+    .rct-title{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.03em;margin-bottom:.75rem;line-height:1.05}
+    .rct-sub{font-size:.95rem;color:#666;max-width:500px;margin:0 auto 3rem;line-height:1.65}
+
+    .rct-arms{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;max-width:650px;margin:0 auto;text-align:left}
+    @media(max-width:600px){.rct-arms{grid-template-columns:1fr;gap:1rem}.rct-vs{display:none}}
+    .rct-arm{padding:2rem;border-radius:16px;border:1px solid;opacity:0;transition:opacity .6s,transform .6s}
+    .rct-arm.show{opacity:1;transform:translateX(0)!important}
+    .arm-t{background:rgba(29,78,216,.04);border-color:rgba(29,78,216,.15);transform:translateX(-30px)}
+    .arm-c{background:#fff;border-color:#E0DDD5;transform:translateX(30px)}
+    .arm-tag{font-size:.55rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.6rem}
+    .arm-t .arm-tag{color:#1D4ED8}.arm-c .arm-tag{color:#999}
+    .arm-name{font-size:1.1rem;font-weight:700;margin-bottom:.5rem;letter-spacing:-.01em}
+    .arm-body{font-size:.78rem;color:#666;line-height:1.6}.arm-body strong{color:#111}
+    .rct-vs{display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#ccc;letter-spacing:.1em}
+    .arm-outcomes{margin-top:1rem;display:flex;flex-direction:column;gap:.3rem}
+    .arm-outcome{display:flex;align-items:center;gap:.5rem;font-size:.65rem;color:#666}
+    .ao-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .arm-t .ao-dot{background:#1D4ED8}.arm-c .ao-dot{background:#ccc}
+
+    /* ════════ 5. DARK DASHBOARD (big, detailed) ════════ */
+    .dashboard{background:#050D1A;color:#F1F5F9;padding:6rem 2rem;position:relative}
+    .db-container{max-width:1000px;margin:0 auto}
+    .db-header{text-align:center;margin-bottom:4rem}
+    .db-tag{font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#06B6D4;margin-bottom:.75rem}
+    .db-title{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.03em;margin-bottom:.75rem}
+    .db-sub{font-size:.9rem;color:#64748B;max-width:480px;margin:0 auto;line-height:1.65}
+
+    /* KPI Row */
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:3rem}
+    @media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+    .kpi{padding:1.5rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+    .kpi.show{opacity:1;transform:translateY(0)}
+    .kpi-v{font-size:2.4rem;font-weight:800;letter-spacing:-.04em;line-height:1}
+    .kpi-l{font-size:.58rem;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-top:.3rem}
+    .kpi-delta{font-size:.55rem;font-weight:700;margin-top:.4rem;padding:.12rem .45rem;border-radius:99px;display:inline-block}
+    .delta-up{background:rgba(16,185,129,.1);color:#34D399}
+
+    /* Two-column: Locality + Bars */
+    .db-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:3rem}
+    @media(max-width:700px){.db-grid{grid-template-columns:1fr}}
+    .db-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.5rem}
+    .dc-tag{font-size:.55rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:1rem}
+
+    /* Locality heatmap */
+    .loc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.35rem}
+    .loc{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:default;transition:transform .15s;border:1px solid transparent}
+    .loc:hover{transform:scale(1.08)}
+    .loc-name{font-size:.38rem;font-weight:700;text-align:center;line-height:1.1;letter-spacing:.02em}
+    .loc-num{font-size:.52rem;font-weight:800}
+    .loc-total{text-align:center;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06)}
+    .loc-total .big{font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,#06B6D4,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .loc-total .lbl{font-size:.55rem;color:#64748B;text-transform:uppercase;letter-spacing:.08em;margin-top:.1rem}
+
+    /* Capability bars */
+    .bars{display:flex;flex-direction:column;gap:.75rem}
+    .b-row{display:flex;flex-direction:column;gap:.3rem}
+    .b-meta{display:flex;justify-content:space-between;font-size:.62rem}.b-name{color:#64748B}.b-val{color:#F1F5F9;font-weight:700}
+    .b-track{height:6px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden}
+    .b-fill{height:100%;border-radius:99px;width:0%;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+
+    /* Compare chart (full width) */
+    .compare-section{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.5rem}
+    .cmp-tag{font-size:.55rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#8B5CF6;margin-bottom:1.5rem}
+    .cmp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+    @media(max-width:700px){.cmp-grid{grid-template-columns:1fr}}
+    .cmp-col{}.cmp-label{font-size:.6rem;color:#64748B;font-weight:600;margin-bottom:.5rem}
+    .cmp-bars{display:flex;flex-direction:column;gap:.3rem}
+    .cmp-bar{display:grid;grid-template-columns:40px 1fr 32px;align-items:center;gap:.4rem;font-size:.56rem}
+    .cmp-tag-sm{font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+    .cmp-track{height:8px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden}
+    .cmp-fill{height:100%;border-radius:99px;width:0%;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+    .cmp-num{font-weight:700;text-align:right}
+
+    /* ════════ 6. CLOSE ════════ */
+    .close{background:linear-gradient(180deg,#050D1A,#030712);padding:6rem 2rem;text-align:center;position:relative}
+    .close::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(139,92,246,.06),transparent 65%);pointer-events:none}
+    .cl-logo{font-size:clamp(3rem,10vw,7rem);font-weight:900;letter-spacing:-.06em;background:linear-gradient(135deg,#06B6D4,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;margin-bottom:1rem}
+    .cl-sub{font-size:1rem;color:#64748B;max-width:400px;margin:0 auto 2rem;line-height:1.7}
+    .cl-author{font-size:.75rem;font-weight:600;color:#F1F5F9;margin-bottom:.2rem}
+    .cl-role{font-size:.65rem;color:#64748B}.cl-role a{color:#06B6D4}
+
+    footer{background:#030712;border-top:1px solid rgba(255,255,255,.06);padding:1.5rem;text-align:center;font-size:.65rem;color:#64748B}
+    footer a{color:#06B6D4;text-decoration:none}
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">&#8592; Gallery</a>
+<div id="progress"></div>
+
+<!-- ═══ 1. HERO ═══ -->
+<section class="hero">
+  <div class="h-logo">Nexo</div>
+  <p class="h-sub"><strong>AI copilot for caseworkers.</strong> Amplifying Bogota's public employment services at city scale.</p>
+  <div class="h-stats">
+    <div class="hs"><div class="v">38,844</div><div class="l">Placements</div></div>
+    <div class="hs-sep"></div>
+    <div class="hs"><div class="v">20</div><div class="l">Localities</div></div>
+    <div class="hs-sep"></div>
+    <div class="hs"><div class="v">RCT</div><div class="l">Evaluation</div></div>
+  </div>
+  <div class="scroll-cue">Scroll to decompose &darr;</div>
+</section>
+
+<!-- ═══ 2. NARRATIVE TEARDOWN ═══ -->
+<section id="teardown">
+  <div class="td-sticky" id="td-sticky">
+    <div class="stage" id="stage">
+
+      <!-- Jobseeker profiles (arrive from edges) -->
+      <div class="js-profile" id="js1" style="background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.25);">
+        &#128100;
+        <div class="js-label" style="color:#10B981;">Carlos H.</div>
+      </div>
+      <div class="js-profile" id="js2" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25);">
+        &#128100;
+        <div class="js-label" style="color:#F59E0B;">Ana M.</div>
+      </div>
+      <div class="js-profile" id="js3" style="background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.25);">
+        &#128100;
+        <div class="js-label" style="color:#F43F5E;">Luis R.</div>
+      </div>
+      <div class="js-profile" id="js4" style="background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.25);">
+        &#128100;
+        <div class="js-label" style="color:#06B6D4;">Sofia P.</div>
+      </div>
+      <div class="js-profile" id="js5" style="background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.25);">
+        &#128100;
+        <div class="js-label" style="color:#8B5CF6;">Diego T.</div>
+      </div>
+
+      <!-- Caseworker card (center) -->
+      <div class="cw-card" id="cw-card">
+        <div class="cw-ico">&#128101;</div>
+        <div class="cw-name">Laura Sanchez</div>
+        <div class="cw-role">ADE Caseworker &middot; Bogota</div>
+        <div class="cw-burden" id="cw-burden">&#9200; 4.4 hrs per case &middot; 38 active cases</div>
+      </div>
+
+      <!-- Nexo solution (appears with glow) -->
+      <div class="nexo-card" id="nexo-card">
+        <div class="nx-glow" id="nx-glow"></div>
+        <div class="nx-ico">&#9670;</div>
+        <div class="nx-name">Nexo</div>
+        <div class="nx-role">AI Copilot Engine</div>
+      </div>
+
+      <!-- Capability cards (teardown from Nexo) -->
+      <div class="cap-card" id="cap1">
+        <div class="cap-ico">&#9998;</div>
+        <div class="cap-name">CV Generation</div>
+        <div class="cap-stat">94% accuracy</div>
+        <div class="cap-desc">Auto-drafts structured CVs from raw jobseeker data. Saves ~40 min per case.</div>
+      </div>
+      <div class="cap-card" id="cap2">
+        <div class="cap-ico">&#127919;</div>
+        <div class="cap-name">Skill Profiling</div>
+        <div class="cap-stat">89% match</div>
+        <div class="cap-desc">Maps skills to occupations using top-caseworker playbooks.</div>
+      </div>
+      <div class="cap-card" id="cap3">
+        <div class="cap-ico">&#128279;</div>
+        <div class="cap-name">Job Matching</div>
+        <div class="cap-stat">91% accuracy</div>
+        <div class="cap-desc">Ranked vacancy recommendations by employer fit and jobseeker profile.</div>
+      </div>
+      <div class="cap-card" id="cap4">
+        <div class="cap-ico">&#9881;</div>
+        <div class="cap-name">Admin Automation</div>
+        <div class="cap-stat">-72% time</div>
+        <div class="cap-desc">Follow-ups, outcome reports, and routine documentation automated.</div>
+      </div>
+
+    </div>
+
+    <div class="td-phase">
+      <div class="td-phase-title" id="ph-title">Jobseekers arrive at the ADE</div>
+      <div class="td-phase-sub" id="ph-sub">Every placement starts with a person</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 3. WARM PIPELINE (V2-style spine) ═══ -->
+<section class="warm-pipe" id="warm-pipe">
+  <div class="blob" style="width:400px;height:400px;background:#FECACA;top:-100px;right:-100px;"></div>
+  <div class="blob" style="width:300px;height:300px;background:#CCFBF1;bottom:-80px;left:-80px;"></div>
+  <div class="blob" style="width:250px;height:250px;background:#FED7AA;top:40%;left:50%;"></div>
+  <div class="wp-container">
+    <div class="wp-header">
+      <div class="wp-tag reveal">The Pipeline</div>
+      <h2 class="wp-title reveal">Five stages, amplified by AI</h2>
+      <p class="wp-sub reveal">The ADE caseworker action path. <strong>Nexo assists at every step</strong> — caseworkers retain full discretion.</p>
+    </div>
+    <div class="spine-wrap" id="spine-wrap">
+      <div class="spine"><div class="spine-fill" id="spine-fill"></div></div>
+      <div class="steps" id="steps">
+        <div class="step">
+          <div class="step-card"><div class="sc-stage">Stage 01</div><div class="sc-name">Registration &amp; CV Creation</div><div class="sc-desc">Jobseeker registered in the national database. Profile built from personal details, work history, documents.</div></div>
+          <div class="step-node"><div class="node-dot"><span class="node-num">1</span></div></div>
+          <div class="step-ai"><div class="ai-label"><div class="ai-dot"></div>Nexo AI</div><div class="ai-action">Auto CV draft</div><div class="ai-chip">Saves ~40 min</div></div>
+        </div>
+        <div class="step">
+          <div class="step-card"><div class="sc-stage">Stage 02</div><div class="sc-name">Occupational Orientation</div><div class="sc-desc">Skills, competencies, and interests profiled through interviews and assessments.</div></div>
+          <div class="step-node"><div class="node-dot"><span class="node-num">2</span></div></div>
+          <div class="step-ai"><div class="ai-label"><div class="ai-dot"></div>Nexo AI</div><div class="ai-action">Skill mapping</div><div class="ai-chip">Top-performer playbooks</div></div>
+        </div>
+        <div class="step">
+          <div class="step-card"><div class="sc-stage">Stage 03</div><div class="sc-name">Training &amp; Skills Gap</div><div class="sc-desc">Referral to targeted training programs, workshops, and certifications.</div></div>
+          <div class="step-node"><div class="node-dot"><span class="node-num">3</span></div></div>
+          <div class="step-ai"><div class="ai-label"><div class="ai-dot"></div>Nexo AI</div><div class="ai-action">Gap analysis</div><div class="ai-chip">Shortest path to job</div></div>
+        </div>
+        <div class="step">
+          <div class="step-card"><div class="sc-stage">Stage 04</div><div class="sc-name">Job Matching &amp; Referral</div><div class="sc-desc">Vacancies ranked by fit. Employer requirements matched to jobseeker profile.</div></div>
+          <div class="step-node"><div class="node-dot"><span class="node-num">4</span></div></div>
+          <div class="step-ai"><div class="ai-label"><div class="ai-dot"></div>Nexo AI</div><div class="ai-action">Ranked matches</div><div class="ai-chip">91% accuracy</div></div>
+        </div>
+        <div class="step">
+          <div class="step-card"><div class="sc-stage">Stage 05</div><div class="sc-name">Placement &amp; Follow-up</div><div class="sc-desc">Post-hire tracking of wages, retention, contract type, and outcomes.</div></div>
+          <div class="step-node"><div class="node-dot"><span class="node-num">5</span></div></div>
+          <div class="step-ai"><div class="ai-label"><div class="ai-dot"></div>Nexo AI</div><div class="ai-action">Auto reports</div><div class="ai-chip">-72% admin time</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 4. RCT METHODOLOGY (full page) ═══ -->
+<section class="rct-page">
+  <div class="rct-inner">
+    <div class="rct-tag reveal">Methodology</div>
+    <h2 class="rct-title reveal">Randomized Controlled Trial</h2>
+    <p class="rct-sub reveal">Caseworkers at the ADE randomly assigned access to Nexo. Outcomes tracked through administrative records: wages, placement rates, unemployment duration.</p>
+    <div class="rct-arms" id="rct-arms">
+      <div class="rct-arm arm-t">
+        <div class="arm-tag">Treatment</div>
+        <div class="arm-name">Nexo AI Copilot</div>
+        <div class="arm-body"><strong>Full access</strong> to CV drafting, skill profiling, match recommendations, and admin automation. Human discretion retained at every step.</div>
+        <div class="arm-outcomes">
+          <div class="arm-outcome"><div class="ao-dot"></div>CV generation</div>
+          <div class="arm-outcome"><div class="ao-dot"></div>Skill profiling</div>
+          <div class="arm-outcome"><div class="ao-dot"></div>Job matching</div>
+          <div class="arm-outcome"><div class="ao-dot"></div>Admin automation</div>
+        </div>
+      </div>
+      <div class="rct-vs">VS</div>
+      <div class="rct-arm arm-c">
+        <div class="arm-tag">Control</div>
+        <div class="arm-name">Standard Workflow</div>
+        <div class="arm-body"><strong>Same jobseekers</strong>, same outcome tracking — no AI access. Isolating the causal effect of AI assistance.</div>
+        <div class="arm-outcomes">
+          <div class="arm-outcome"><div class="ao-dot"></div>Wages</div>
+          <div class="arm-outcome"><div class="ao-dot"></div>Placement rates</div>
+          <div class="arm-outcome"><div class="ao-dot"></div>Unemployment spell</div>
+          <div class="arm-outcome"><div class="ao-dot"></div>Survey data</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 5. DARK DASHBOARD (big) ═══ -->
+<section class="dashboard">
+  <div class="db-container">
+    <div class="db-header">
+      <div class="db-tag reveal">Deep Dive — Projected Outcomes</div>
+      <h2 class="db-title reveal">Impact at scale</h2>
+      <p class="db-sub reveal">Based on comparable AI-at-work interventions. ADE administrative data across all 20 Bogota localities.</p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-row" id="kpi-row">
+      <div class="kpi"><div class="kpi-v" style="background:linear-gradient(135deg,#06B6D4,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-count="38844">0</div><div class="kpi-l">Placements 2025</div><div class="kpi-delta delta-up">&#8593; +18% vs 2024</div></div>
+      <div class="kpi"><div class="kpi-v" style="color:#06B6D4;">+34%</div><div class="kpi-l">Placement rate uplift</div><div class="kpi-delta delta-up">&#8593; Treatment effect</div></div>
+      <div class="kpi"><div class="kpi-v" style="color:#10B981;">3x</div><div class="kpi-l">Cases per caseworker</div><div class="kpi-delta delta-up">&#8593; Throughput</div></div>
+      <div class="kpi"><div class="kpi-v" style="color:#F59E0B;">+12%</div><div class="kpi-l">Starting wages</div><div class="kpi-delta delta-up">&#8593; vs control</div></div>
+    </div>
+
+    <!-- Two column: Localities + Capability Bars -->
+    <div class="db-grid reveal">
+      <!-- Locality Heatmap -->
+      <div class="db-card">
+        <div class="dc-tag" style="color:#06B6D4;">Bogota Localities &middot; Placement Density</div>
+        <div class="loc-grid" id="loc-grid"></div>
+        <div class="loc-total"><div class="big">20 / 20</div><div class="lbl">Full locality coverage</div></div>
+      </div>
+      <!-- Bars -->
+      <div class="db-card">
+        <div class="dc-tag" style="color:#8B5CF6;">AI Capability Coverage</div>
+        <div class="bars" id="bars">
+          <div class="b-row"><div class="b-meta"><span class="b-name">CV Drafting</span><span class="b-val">94%</span></div><div class="b-track"><div class="b-fill" data-w="94" style="background:linear-gradient(90deg,#06B6D4,#8B5CF6);"></div></div></div>
+          <div class="b-row"><div class="b-meta"><span class="b-name">Skill Profiling</span><span class="b-val">89%</span></div><div class="b-track"><div class="b-fill" data-w="89" style="background:linear-gradient(90deg,#8B5CF6,#A78BFA);"></div></div></div>
+          <div class="b-row"><div class="b-meta"><span class="b-name">Job Matching</span><span class="b-val">91%</span></div><div class="b-track"><div class="b-fill" data-w="91" style="background:linear-gradient(90deg,#10B981,#06B6D4);"></div></div></div>
+          <div class="b-row"><div class="b-meta"><span class="b-name">Training Rec.</span><span class="b-val">76%</span></div><div class="b-track"><div class="b-fill" data-w="76" style="background:linear-gradient(90deg,#F59E0B,#10B981);"></div></div></div>
+          <div class="b-row"><div class="b-meta"><span class="b-name">Admin Automation</span><span class="b-val">72%</span></div><div class="b-track"><div class="b-fill" data-w="72" style="background:linear-gradient(90deg,#FDA4AF,#F59E0B);"></div></div></div>
+        </div>
+        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06);">
+          <div class="dc-tag" style="color:#10B981;">Pipeline Time Savings</div>
+          <div class="bars" id="bars2" style="margin-top:.75rem;">
+            <div class="b-row"><div class="b-meta"><span class="b-name">Registration &amp; CV</span><span class="b-val">-55%</span></div><div class="b-track"><div class="b-fill" data-w="55" style="background:linear-gradient(90deg,#06B6D4,#10B981);"></div></div></div>
+            <div class="b-row"><div class="b-meta"><span class="b-name">Orientation</span><span class="b-val">-44%</span></div><div class="b-track"><div class="b-fill" data-w="44" style="background:linear-gradient(90deg,#8B5CF6,#06B6D4);"></div></div></div>
+            <div class="b-row"><div class="b-meta"><span class="b-name">Training</span><span class="b-val">-50%</span></div><div class="b-track"><div class="b-fill" data-w="50" style="background:linear-gradient(90deg,#F59E0B,#10B981);"></div></div></div>
+            <div class="b-row"><div class="b-meta"><span class="b-name">Job Matching</span><span class="b-val">-60%</span></div><div class="b-track"><div class="b-fill" data-w="60" style="background:linear-gradient(90deg,#10B981,#06B6D4);"></div></div></div>
+            <div class="b-row"><div class="b-meta"><span class="b-name">Follow-up</span><span class="b-val">-64%</span></div><div class="b-track"><div class="b-fill" data-w="64" style="background:linear-gradient(90deg,#FDA4AF,#F59E0B);"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compare (Treatment vs Control) -->
+    <div class="compare-section reveal" id="compare">
+      <div class="cmp-tag">Treatment vs Control — RCT Outcomes</div>
+      <div class="cmp-grid">
+        <div class="cmp-col">
+          <div class="cmp-label">Placement Rate</div>
+          <div class="cmp-bars">
+            <div class="cmp-bar"><span class="cmp-tag-sm" style="color:#06B6D4;">AI</span><div class="cmp-track"><div class="cmp-fill" data-w="78" style="background:linear-gradient(90deg,#06B6D4,#8B5CF6);"></div></div><span class="cmp-num" style="color:#F1F5F9;">78%</span></div>
+            <div class="cmp-bar"><span class="cmp-tag-sm" style="color:#64748B;">Ctrl</span><div class="cmp-track"><div class="cmp-fill" data-w="58" style="background:#334155;"></div></div><span class="cmp-num" style="color:#64748B;">58%</span></div>
+          </div>
+        </div>
+        <div class="cmp-col">
+          <div class="cmp-label">Starting Wages (indexed)</div>
+          <div class="cmp-bars">
+            <div class="cmp-bar"><span class="cmp-tag-sm" style="color:#10B981;">AI</span><div class="cmp-track"><div class="cmp-fill" data-w="82" style="background:linear-gradient(90deg,#10B981,#06B6D4);"></div></div><span class="cmp-num" style="color:#F1F5F9;">+12%</span></div>
+            <div class="cmp-bar"><span class="cmp-tag-sm" style="color:#64748B;">Ctrl</span><div class="cmp-track"><div class="cmp-fill" data-w="68" style="background:#334155;"></div></div><span class="cmp-num" style="color:#64748B;">Base</span></div>
+          </div>
+        </div>
+        <div class="cmp-col">
+          <div class="cmp-label">Cases / Caseworker</div>
+          <div class="cmp-bars">
+            <div class="cmp-bar"><span class="cmp-tag-sm" style="color:#F59E0B;">AI</span><div class="cmp-track"><div class="cmp-fill" data-w="90" style="background:linear-gradient(90deg,#F59E0B,#10B981);"></div></div><span class="cmp-num" style="color:#F1F5F9;">3x</span></div>
+            <div class="cmp-bar"><span class="cmp-tag-sm" style="color:#64748B;">Ctrl</span><div class="cmp-track"><div class="cmp-fill" data-w="30" style="background:#334155;"></div></div><span class="cmp-num" style="color:#64748B;">1x</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 6. CLOSE ═══ -->
+<section class="close">
+  <div class="cl-logo reveal">Nexo</div>
+  <p class="cl-sub reveal">Empowering every caseworker with AI. Measuring the impact with science.</p>
+  <div class="cl-author reveal">Andres Felipe Camacho &nbsp;&middot;&nbsp; MsCAPP</div>
+  <div class="cl-role reveal"><a href="https://github.com/anfelipecb">github.com/anfelipecb</a></div>
+</section>
+
+<footer><a href="../index.html">&#8592; Gallery</a> &middot; Nexo &middot; 2025</footer>
+
+<script>
+// ── PROGRESS ──
+const bar=document.getElementById('progress');
+window.addEventListener('scroll',()=>{bar.style.width=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight)*100)+'%';},{passive:true});
+
+// ── NARRATIVE TEARDOWN ──
+(function(){
+  const sec=document.getElementById('teardown');
+  const sticky=document.getElementById('td-sticky');
+  const js=[document.getElementById('js1'),document.getElementById('js2'),document.getElementById('js3'),document.getElementById('js4'),document.getElementById('js5')];
+  const cw=document.getElementById('cw-card');
+  const burden=document.getElementById('cw-burden');
+  const nexo=document.getElementById('nexo-card');
+  const glow=document.getElementById('nx-glow');
+  const caps=[document.getElementById('cap1'),document.getElementById('cap2'),document.getElementById('cap3'),document.getElementById('cap4')];
+  const pt=document.getElementById('ph-title'),ps=document.getElementById('ph-sub');
+
+  // Jobseeker start positions (off-screen, scattered)
+  const jsStart=[
+    {x:-420,y:-120},{x:-380,y:80},{x:420,y:-100},{x:380,y:100},{x:0,y:-220}
+  ];
+  // Jobseeker positions when gathered near caseworker
+  const jsGather=[
+    {x:-130,y:-70},{x:-100,y:60},{x:130,y:-60},{x:100,y:70},{x:0,y:-110}
+  ];
+
+  // Capability teardown positions (exploded from center)
+  const capPos=[
+    {x:-260,y:-120,r:-6,rx:8},{x:260,y:-100,r:6,rx:-5},{x:-240,y:110,r:4,rx:6},{x:250,y:120,r:-5,rx:-8}
+  ];
+
+  const phases=[
+    {t:'Jobseekers arrive at the ADE',s:'Every placement starts with a person seeking work'},
+    {t:'The caseworker receives them',s:'One person managing dozens of cases manually'},
+    {t:'The bottleneck becomes clear',s:'4.4 hours per jobseeker — 38 active cases at once'},
+    {t:'Nexo enters the picture',s:'An AI copilot that amplifies, not replaces'},
+    {t:'Inside the Nexo engine',s:'Four capabilities, one system — decomposed'},
+    {t:'The full architecture',s:'AI suggests. Caseworkers decide. Outcomes measured.'}
+  ];
+
+  function ease(t){return t<.5?2*t*t:-1+(4-2*t)*t}
+  function lerp(a,b,t){return a+(b-a)*t}
+  function clamp(v){return Math.max(0,Math.min(1,v))}
+
+  function update(){
+    const r=sec.getBoundingClientRect();
+    const p=clamp(-r.top/(sec.offsetHeight-window.innerHeight));
+
+    // 6 phases across 0-1
+    // P0 (0-.15): Profiles arrive from edges toward center
+    // P1 (.15-.28): Caseworker appears at center, profiles gather around
+    // P2 (.28-.4): Burden text shows, profiles pulse red, overwhelmed
+    // P3 (.4-.55): Nexo card appears with glow, profiles fade/shrink, caseworker shifts left
+    // P4 (.55-.8): Nexo explodes into 4 capability cards (Apple teardown)
+    // P5 (.8-1): Full decomposition, camera pans, everything settles
+
+    const pi=p<.15?0:p<.28?1:p<.4?2:p<.55?3:p<.8?4:5;
+    pt.textContent=phases[pi].t;ps.textContent=phases[pi].s;
+
+    // Camera pan (subtle through whole section)
+    sticky.style.perspectiveOrigin=`${lerp(50,42,ease(p))}% ${lerp(50,45,ease(p))}%`;
+
+    // ── PHASE 0: Profiles arrive ──
+    if(p<.15){
+      const t=ease(p/.15);
+      js.forEach((j,i)=>{
+        j.style.opacity=t;
+        j.style.transform=`translate(${lerp(jsStart[i].x,jsStart[i].x*.4,t)}px,${lerp(jsStart[i].y,jsStart[i].y*.4,t)}px) scale(${lerp(.5,1,t)})`;
+      });
+      cw.style.opacity=0;nexo.style.opacity=0;
+      caps.forEach(c=>{c.style.opacity=0;});
+    }
+    // ── PHASE 1: Caseworker appears, profiles gather ──
+    else if(p<.28){
+      const t=ease((p-.15)/.13);
+      js.forEach((j,i)=>{
+        j.style.opacity=1;
+        j.style.transform=`translate(${lerp(jsStart[i].x*.4,jsGather[i].x,t)}px,${lerp(jsStart[i].y*.4,jsGather[i].y,t)}px) scale(1)`;
+      });
+      cw.style.opacity=lerp(0,1,t);
+      cw.style.transform=`translate(0,0) scale(${lerp(.9,1,t)})`;
+      burden.classList.remove('show');
+      nexo.style.opacity=0;
+      caps.forEach(c=>{c.style.opacity=0;});
+    }
+    // ── PHASE 2: Overwhelmed — burden shows ──
+    else if(p<.4){
+      const t=ease((p-.28)/.12);
+      js.forEach((j,i)=>{
+        const pulse=Math.sin(t*Math.PI*3+i)*.08;
+        j.style.opacity=1;
+        j.style.transform=`translate(${jsGather[i].x}px,${jsGather[i].y}px) scale(${1+pulse})`;
+        j.style.borderColor=`rgba(244,63,94,${.15+t*.35})`;
+      });
+      cw.style.opacity=1;cw.style.transform='translate(0,0) scale(1)';
+      if(t>.3)burden.classList.add('show');
+      nexo.style.opacity=0;
+      caps.forEach(c=>{c.style.opacity=0;});
+    }
+    // ── PHASE 3: Nexo appears, profiles shrink ──
+    else if(p<.55){
+      const t=ease((p-.4)/.15);
+      js.forEach((j,i)=>{
+        j.style.opacity=lerp(1,.15,t);
+        j.style.transform=`translate(${lerp(jsGather[i].x,jsGather[i].x*1.8,t)}px,${lerp(jsGather[i].y,jsGather[i].y*1.5,t)}px) scale(${lerp(1,.5,t)})`;
+        j.style.borderColor='rgba(16,185,129,.2)';
+      });
+      cw.style.opacity=lerp(1,.8,t);
+      cw.style.transform=`translate(${lerp(0,-180,t)}px,0) scale(${lerp(1,.85,t)})`;
+      burden.classList.remove('show');
+
+      nexo.style.opacity=lerp(0,1,t);
+      nexo.style.transform=`translate(${lerp(0,100,t)}px,0) scale(${lerp(.7,1,t)})`;
+      glow.style.opacity=t;
+      nexo.style.boxShadow=`0 0 ${lerp(0,60,t)}px rgba(139,92,246,${lerp(0,.25,t)})`;
+
+      caps.forEach(c=>{c.style.opacity=0;});
+    }
+    // ── PHASE 4: Nexo teardown — capabilities explode out ──
+    else if(p<.8){
+      const t=ease((p-.55)/.25);
+      js.forEach(j=>{j.style.opacity=0;});
+      cw.style.opacity=lerp(.8,.6,t);
+      cw.style.transform=`translate(${lerp(-180,-240,t)}px,${lerp(0,20,t)}px) scale(.82) rotateY(${lerp(0,-8,t)}deg)`;
+
+      nexo.style.opacity=lerp(1,.3,t);
+      nexo.style.transform=`translate(100px,0) scale(${lerp(1,.7,t)})`;
+      glow.style.opacity=lerp(1,.5,t);
+      nexo.style.boxShadow=`0 0 ${lerp(60,30,t)}px rgba(139,92,246,${lerp(.25,.1,t)})`;
+
+      caps.forEach((c,i)=>{
+        const delay=i*.08;
+        const ct=clamp((t-delay)/(1-delay));
+        const et=ease(ct);
+        c.style.opacity=et;
+        c.style.transform=`translate(${lerp(100,capPos[i].x,et)}px,${lerp(0,capPos[i].y,et)}px) rotate(${lerp(0,capPos[i].r,et)}deg) rotateX(${lerp(0,capPos[i].rx,et)}deg) translateZ(${lerp(0,50+i*15,et)}px)`;
+      });
+    }
+    // ── PHASE 5: Full decomposition settled ──
+    else{
+      const t=ease((p-.8)/.2);
+      js.forEach(j=>{j.style.opacity=0;});
+      cw.style.opacity=.6;
+      cw.style.transform=`translate(${lerp(-240,-260,t)}px,20px) scale(.82) rotateY(-8deg)`;
+
+      nexo.style.opacity=.3;
+      nexo.style.transform=`translate(100px,0) scale(.7)`;
+
+      caps.forEach((c,i)=>{
+        c.style.opacity=1;
+        const drift=Math.sin(t*Math.PI+i)*.5;
+        c.style.transform=`translate(${capPos[i].x+drift*3}px,${capPos[i].y+drift*2}px) rotate(${capPos[i].r}deg) rotateX(${capPos[i].rx}deg) translateZ(${50+i*15}px)`;
+      });
+
+      sticky.style.perspectiveOrigin=`${lerp(42,38,t)}% ${lerp(45,42,t)}%`;
+    }
+  }
+  window.addEventListener('scroll',update,{passive:true});
+  update();
+})();
+
+// ── PIPELINE SPINE FILL ──
+(function(){
+  const wrap=document.getElementById('spine-wrap');
+  const fill=document.getElementById('spine-fill');
+  function update(){
+    const r=wrap.getBoundingClientRect();
+    const pct=Math.max(0,Math.min(100,(-r.top/(r.height-window.innerHeight))*100));
+    fill.style.height=pct+'%';
+  }
+  window.addEventListener('scroll',update,{passive:true});
+  update();
+})();
+
+// ── STEP REVEAL ──
+const stepIO=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('show');stepIO.unobserve(el.target);}});},{threshold:.25});
+document.querySelectorAll('.step').forEach(s=>stepIO.observe(s));
+
+// ── RCT ARMS SLIDE IN ──
+const rctIO=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.querySelectorAll('.rct-arm').forEach((a,i)=>{setTimeout(()=>a.classList.add('show'),i*200);});rctIO.unobserve(el.target);}});},{threshold:.3});
+document.querySelectorAll('#rct-arms').forEach(el=>rctIO.observe(el));
+
+// ── REVEALS ──
+const io=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('in');io.unobserve(el.target);}});},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// ── KPI COUNTERS + STAGGER ──
+function animCount(el){
+  const target=+el.dataset.count;const dur=2000;const t0=performance.now();
+  function step(now){const p=Math.min(1,(now-t0)/dur);const e=1-Math.pow(1-p,3);el.textContent=Math.round(e*target).toLocaleString();if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+const kpiIO=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){
+  el.target.querySelectorAll('.kpi').forEach((k,i)=>{setTimeout(()=>k.classList.add('show'),i*100);});
+  el.target.querySelectorAll('[data-count]').forEach(animCount);
+  kpiIO.unobserve(el.target);
+}});},{threshold:.2});
+document.querySelectorAll('#kpi-row').forEach(el=>kpiIO.observe(el));
+
+// ── BAR FILLS ──
+const barIO=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.querySelectorAll('.b-fill,.cmp-fill').forEach(b=>{b.style.width=b.dataset.w+'%';});barIO.unobserve(el.target);}});},{threshold:.2});
+document.querySelectorAll('#bars,#bars2,#compare').forEach(el=>barIO.observe(el));
+
+// ── LOCALITY GRID ──
+const locs=[{n:'Usaquen',v:412},{n:'Chapinero',v:298},{n:'Santa Fe',v:501},{n:'San Crist.',v:634},{n:'Usme',v:889},{n:'Tunjuelito',v:445},{n:'Bosa',v:1120},{n:'Kennedy',v:1543},{n:'Fontibon',v:387},{n:'Engativa',v:876},{n:'Suba',v:1201},{n:'Barrios U.',v:334},{n:'Teusaquillo',v:219},{n:'Los Mart.',v:411},{n:'Antonio N.',v:378},{n:'Puente A.',v:956},{n:'Candelaria',v:189},{n:'Rafael U.',v:723},{n:'C. Bolivar',v:1089},{n:'Sumapaz',v:67}];
+const mx=Math.max(...locs.map(l=>l.v));
+const grid=document.getElementById('loc-grid');
+const cols=['rgba(6,182,212,.1)','rgba(6,182,212,.2)','rgba(6,182,212,.32)','rgba(6,182,212,.48)','rgba(6,182,212,.65)'];
+locs.forEach((l,i)=>{
+  const p=l.v/mx;const idx=Math.floor(p*(cols.length-1));
+  const d=document.createElement('div');d.className='loc';d.style.background=cols[idx];
+  d.style.borderColor=`rgba(6,182,212,${.1+p*.3})`;
+  d.style.opacity='0';d.style.transition=`opacity .3s ${i*0.04}s`;
+  d.innerHTML=`<span class="loc-name" style="color:rgba(255,255,255,${.4+p*.6})">${l.n}</span><span class="loc-num" style="color:rgba(6,182,212,${.5+p*.5})">${l.v}</span>`;
+  d.title=`${l.n}: ${l.v.toLocaleString()} placements`;
+  grid.appendChild(d);
+});
+
+// Animate localities in
+const locIO=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.querySelectorAll('.loc').forEach(l=>{l.style.opacity='1';});locIO.unobserve(el.target);}});},{threshold:.2});
+locIO.observe(grid);
+</script>
+</body>
+</html>
