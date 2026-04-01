@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Brutalist</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root { --neon: #39FF14; --bg: #000; --text: #fff; --dim: #333; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', monospace;
+      line-height: 1.5;
+    }
+
+    a { color: var(--neon); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .back {
+      position: fixed; top: 1rem; left: 1rem; z-index: 100;
+      font-size: 0.7rem; color: var(--dim); border: 1px solid var(--dim);
+      padding: 0.3rem 0.6rem; text-decoration: none;
+    }
+    .back:hover { color: var(--neon); border-color: var(--neon); }
+
+    /* GRID OVERLAY */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding-bottom: 4rem; border-bottom: 2px solid var(--text);
+    }
+
+    .hero-tag {
+      font-size: 0.65rem; color: var(--neon);
+      border: 1px solid var(--neon); display: inline-block;
+      padding: 0.2rem 0.5rem; margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 12vw, 10rem);
+      font-weight: 700; letter-spacing: -0.06em; line-height: 0.9;
+      text-transform: uppercase;
+    }
+
+    .hero-title span { color: var(--neon); }
+
+    .hero-sub {
+      font-size: 0.8rem; color: var(--dim); margin-top: 1.5rem;
+      max-width: 500px; border-left: 2px solid var(--neon); padding-left: 1rem;
+    }
+
+    .hero-meta {
+      display: flex; gap: 3rem; margin-top: 2rem;
+      font-size: 0.7rem; color: var(--dim);
+    }
+
+    .hero-meta strong { color: var(--text); display: block; font-size: 1.8rem; letter-spacing: -0.04em; }
+
+    /* SECTION */
+    .section { border-bottom: 1px solid var(--dim); padding: 3rem 0; }
+
+    .section-head {
+      display: grid; grid-template-columns: 200px 1fr; gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 600px) { .section-head { grid-template-columns: 1fr; gap: 0.5rem; } }
+
+    .section-num {
+      font-size: 0.65rem; color: var(--neon);
+      border: 1px solid var(--neon); display: inline-block;
+      padding: 0.15rem 0.4rem; align-self: start;
+    }
+
+    .section-title {
+      font-size: clamp(1.5rem, 4vw, 3rem);
+      font-weight: 700; text-transform: uppercase;
+      letter-spacing: -0.03em; line-height: 1;
+    }
+
+    /* PIPELINE TABLE */
+    .pipe-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+
+    .pipe-table th {
+      text-align: left; font-size: 0.6rem; color: var(--neon);
+      padding: 0.5rem 0.75rem; border-bottom: 2px solid var(--text);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    .pipe-table td {
+      padding: 0.75rem; border-bottom: 1px solid var(--dim);
+      vertical-align: top;
+    }
+
+    .pipe-table tr:hover { background: rgba(57,255,20,0.03); }
+
+    .time-bar {
+      display: inline-block; height: 4px; background: var(--neon);
+      margin-right: 0.5rem; vertical-align: middle;
+    }
+
+    .ai-badge {
+      display: inline-block; font-size: 0.55rem;
+      color: var(--neon); border: 1px solid var(--neon);
+      padding: 0.1rem 0.4rem; margin-top: 0.3rem;
+    }
+
+    /* STATS STRIP */
+    .stats-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-top: 2px solid var(--text); border-bottom: 2px solid var(--text);
+    }
+
+    @media (max-width: 600px) { .stats-strip { grid-template-columns: repeat(2, 1fr); } }
+
+    .stat-cell {
+      padding: 2rem 1.5rem; border-right: 1px solid var(--dim);
+      text-align: left;
+    }
+
+    .stat-cell:last-child { border-right: none; }
+
+    .stat-cell .val {
+      font-size: 2.5rem; font-weight: 700;
+      letter-spacing: -0.04em; color: var(--neon);
+      line-height: 1;
+    }
+
+    .stat-cell .lbl {
+      font-size: 0.6rem; color: var(--dim); margin-top: 0.3rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+
+    /* RCT */
+    .rct-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    }
+
+    @media (max-width: 600px) { .rct-grid { grid-template-columns: 1fr; } }
+
+    .rct-arm {
+      padding: 2rem; border: 1px solid var(--dim);
+    }
+
+    .rct-arm.treatment { border-color: var(--neon); }
+
+    .rct-arm h3 {
+      font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 0.15em; margin-bottom: 1rem;
+    }
+
+    .rct-arm.treatment h3 { color: var(--neon); }
+    .rct-arm.control h3 { color: var(--dim); }
+
+    .rct-arm p { font-size: 0.75rem; color: var(--dim); line-height: 1.6; }
+    .rct-arm p strong { color: var(--text); }
+
+    /* ASCII ART SECTION */
+    .ascii-box {
+      font-size: 0.65rem; color: var(--neon);
+      background: rgba(57,255,20,0.03);
+      border: 1px solid var(--neon);
+      padding: 1.5rem; overflow-x: auto;
+      white-space: pre; line-height: 1.4;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 2px solid var(--text);
+      padding: 2rem 0; font-size: 0.7rem;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+
+    footer .author { color: var(--text); }
+    footer .meta { color: var(--dim); }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.4s, transform 0.4s; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">[BACK]</a>
+
+<div class="container">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-tag">SYS.NEXO // PROTOTYPE</div>
+    <h1 class="hero-title">NEXO<br><span>AI FOR<br>CASEWORKERS</span></h1>
+    <p class="hero-sub">An AI copilot for public employment caseworkers. Amplifying Bogota's Agencia Distrital de Empleo at city scale. Caseworkers decide — AI suggests.</p>
+    <div class="hero-meta">
+      <div><strong>38,844</strong> placements (2025)</div>
+      <div><strong>20</strong> localities</div>
+      <div><strong>RCT</strong> evaluation</div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section class="section reveal">
+    <div class="section-head">
+      <div class="section-num">[01] PIPELINE</div>
+      <h2 class="section-title">THE CASEWORKER<br>ACTION PATH</h2>
+    </div>
+    <table class="pipe-table">
+      <thead>
+        <tr><th>Stage</th><th>Process</th><th>Time (Manual)</th><th>With Nexo</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>01</td>
+          <td>Registration &amp; CV Creation<br><span class="ai-badge">NEXO: AUTO CV DRAFT</span></td>
+          <td><span class="time-bar" style="width:90px;"></span>45 min</td>
+          <td><span class="time-bar" style="width:36px;"></span>18 min</td>
+        </tr>
+        <tr>
+          <td>02</td>
+          <td>Occupational Orientation<br><span class="ai-badge">NEXO: SKILL MAPPING</span></td>
+          <td><span class="time-bar" style="width:120px;"></span>60 min</td>
+          <td><span class="time-bar" style="width:66px;"></span>33 min</td>
+        </tr>
+        <tr>
+          <td>03</td>
+          <td>Training Referral<br><span class="ai-badge">NEXO: GAP ANALYSIS</span></td>
+          <td><span class="time-bar" style="width:60px;"></span>30 min</td>
+          <td><span class="time-bar" style="width:30px;"></span>15 min</td>
+        </tr>
+        <tr>
+          <td>04</td>
+          <td>Job Matching &amp; Referral<br><span class="ai-badge">NEXO: RANKED MATCHES</span></td>
+          <td><span class="time-bar" style="width:180px;"></span>90 min</td>
+          <td><span class="time-bar" style="width:72px;"></span>36 min</td>
+        </tr>
+        <tr>
+          <td>05</td>
+          <td>Placement &amp; Follow-up<br><span class="ai-badge">NEXO: AUTO REPORTS</span></td>
+          <td><span class="time-bar" style="width:80px;"></span>40 min</td>
+          <td><span class="time-bar" style="width:28px;"></span>14 min</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-strip reveal">
+    <div class="stat-cell"><div class="val">+34%</div><div class="lbl">Placement rate</div></div>
+    <div class="stat-cell"><div class="val">-18%</div><div class="lbl">Unemployment spell</div></div>
+    <div class="stat-cell"><div class="val">3x</div><div class="lbl">Cases / worker</div></div>
+    <div class="stat-cell"><div class="val">+12%</div><div class="lbl">Starting wages</div></div>
+  </div>
+
+  <!-- SYSTEM DIAGRAM -->
+  <section class="section reveal">
+    <div class="section-head">
+      <div class="section-num">[02] SYSTEM</div>
+      <h2 class="section-title">HOW NEXO<br>OPERATES</h2>
+    </div>
+    <div class="ascii-box">
+┌──────────────────────┐     ┌─────────────────────────┐     ┌──────────────────────┐
+│    ADE CASEWORKER    │     │      NEXO AI ENGINE     │     │     JOBSEEKER        │
+│                      │     │                         │     │                      │
+│  ► Reviews profiles  │────▶│  ◈ CV Generation   94%  │     │  Carlos Herrera      │
+│  ► Conducts orient.  │     │  ◈ Skill Profiling 89%  │────▶│  Kennedy, Bogota     │
+│  ► Makes decisions   │◀────│  ◈ Job Matching    91%  │     │  Logistics / Ops     │
+│  ► Full discretion   │     │  ◈ Admin Automate  72%  │     │  4 months unemployed │
+│                      │     │                         │     │                      │
+│  [ACCEPTS / EDITS /  │     │  AI suggests.           │     │  MATCH PROBABILITY:  │
+│   IGNORES all AI]    │     │  Humans decide.         │     │  ████████░░ +34%     │
+└──────────────────────┘     └─────────────────────────┘     └──────────────────────┘</div>
+  </section>
+
+  <!-- RCT -->
+  <section class="section reveal">
+    <div class="section-head">
+      <div class="section-num">[03] METHOD</div>
+      <h2 class="section-title">RANDOMIZED<br>CONTROLLED TRIAL</h2>
+    </div>
+    <div class="rct-grid">
+      <div class="rct-arm treatment">
+        <h3>[TREATMENT] Nexo AI Copilot</h3>
+        <p><strong>Caseworkers assigned Nexo.</strong> Full access to CV drafting, skill profiling, match recommendations, and admin automation. Human discretion retained at all times. Measuring: wages, placement rates, unemployment duration.</p>
+      </div>
+      <div class="rct-arm control">
+        <h3>[CONTROL] Standard Workflow</h3>
+        <p><strong>Standard ADE process.</strong> Same jobseeker population, same outcome tracking. No AI access. Isolating the causal effect of AI assistance on match quality and caseworker throughput.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="author"><strong>Andres Felipe Camacho</strong> // MsCAPP // <a href="https://github.com/anfelipecb">github.com/anfelipecb</a></div>
+    <div class="meta">NEXO // PROTOTYPE // 2025 // <a href="../index.html">[GALLERY]</a></div>
+  </footer>
+
+</div>
+
+<script>
+const io = new IntersectionObserver(e => {
+  e.forEach(el => { if (el.isIntersecting) { el.target.classList.add('in'); io.unobserve(el.target); }});
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

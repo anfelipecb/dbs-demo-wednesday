@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Newspaper</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root { --ink: #111; --muted: #555; --bg: #F5F0E8; --rule: #C8BFA8; --accent: #8B0000; }
+
+    body { background: var(--bg); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; line-height: 1.55; }
+
+    .back {
+      position: fixed; top: 0.75rem; left: 0.75rem; z-index: 100;
+      font-family: -apple-system, sans-serif;
+      font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none;
+      padding: 0.25rem 0.6rem; border: 1px solid var(--rule);
+      background: var(--bg);
+    }
+    .back:hover { color: var(--ink); border-color: var(--ink); }
+
+    .page { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* MASTHEAD */
+    .masthead {
+      text-align: center; padding: 2rem 0 1rem;
+      border-bottom: 4px double var(--ink);
+    }
+
+    .mast-date {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.58rem; color: var(--muted); letter-spacing: 0.15em;
+      text-transform: uppercase; margin-bottom: 0.3rem;
+    }
+
+    .mast-title {
+      font-size: clamp(3rem, 10vw, 7rem); font-weight: 700;
+      letter-spacing: -0.03em; line-height: 0.9;
+      font-family: Georgia, serif;
+    }
+
+    .mast-sub {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.62rem; color: var(--muted); letter-spacing: 0.2em;
+      text-transform: uppercase; margin-top: 0.4rem;
+    }
+
+    /* NAV BAR */
+    .nav-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0; border-bottom: 1px solid var(--rule);
+      font-family: -apple-system, sans-serif; font-size: 0.58rem;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* HEADLINE AREA */
+    .headline-area {
+      padding: 2rem 0; border-bottom: 2px solid var(--ink);
+      text-align: center;
+    }
+
+    .hl-kicker {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;
+    }
+
+    .hl-title {
+      font-size: clamp(1.8rem, 5vw, 3.5rem); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.05; margin-bottom: 0.75rem;
+      max-width: 750px; margin-left: auto; margin-right: auto;
+    }
+
+    .hl-deck {
+      font-size: 1.05rem; color: var(--muted); max-width: 600px;
+      margin: 0 auto 1rem; line-height: 1.55; font-style: italic;
+    }
+
+    .hl-byline {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.65rem; font-weight: 600; color: var(--ink);
+    }
+
+    .hl-byline a { color: var(--accent); text-decoration: none; }
+
+    /* STATS BANNER */
+    .stats-banner {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-bottom: 2px solid var(--ink);
+    }
+
+    @media (max-width: 600px) { .stats-banner { grid-template-columns: repeat(2, 1fr); } }
+
+    .sb-cell {
+      padding: 1.25rem 1rem; text-align: center;
+      border-right: 1px solid var(--rule);
+    }
+
+    .sb-cell:last-child { border-right: none; }
+
+    .sb-val { font-size: 2rem; font-weight: 700; letter-spacing: -0.04em; color: var(--accent); line-height: 1; }
+    .sb-lbl {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.55rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-top: 0.2rem;
+    }
+
+    /* COLUMNS */
+    .columns {
+      display: grid; grid-template-columns: 2fr 1fr;
+      gap: 2rem; padding: 2rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    @media (max-width: 700px) { .columns { grid-template-columns: 1fr; } }
+
+    .col-main {}
+    .col-sidebar { border-left: 1px solid var(--rule); padding-left: 2rem; }
+
+    @media (max-width: 700px) { .col-sidebar { border-left: none; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 2rem; } }
+
+    /* MAIN COLUMN CONTENT */
+    .col-main p {
+      font-size: 0.88rem; line-height: 1.8; margin-bottom: 1rem;
+      text-align: justify; hyphens: auto;
+    }
+
+    .col-main p:first-child::first-letter {
+      font-size: 4rem; float: left; line-height: 0.75;
+      margin-right: 0.5rem; margin-top: 0.15rem; font-weight: 700;
+      color: var(--accent);
+    }
+
+    .col-main h3 {
+      font-size: 1.3rem; font-weight: 700; margin: 1.5rem 0 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    /* SIDEBAR */
+    .sidebar-box {
+      padding: 1rem; background: rgba(139,0,0,0.04);
+      border: 1px solid rgba(139,0,0,0.15); border-radius: 2px;
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar-box h4 {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;
+      padding-bottom: 0.3rem; border-bottom: 1px solid rgba(139,0,0,0.15);
+    }
+
+    .sidebar-box p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+    .sidebar-box p strong { color: var(--ink); }
+
+    .sidebar-stat {
+      text-align: center; padding: 1rem 0;
+      border-bottom: 1px solid var(--rule); margin-bottom: 1rem;
+    }
+
+    .sidebar-stat .val { font-size: 2.5rem; font-weight: 700; color: var(--accent); letter-spacing: -0.04em; line-height: 1; }
+    .sidebar-stat .lbl { font-family: -apple-system, sans-serif; font-size: 0.55rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.2rem; }
+
+    /* PIPELINE TABLE */
+    .pipe-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.78rem; margin: 1.5rem 0;
+    }
+
+    .pipe-table th {
+      font-family: -apple-system, sans-serif;
+      text-align: left; font-size: 0.55rem; font-weight: 700;
+      color: var(--accent); padding: 0.5rem 0.5rem;
+      border-bottom: 2px solid var(--ink);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+
+    .pipe-table td {
+      padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+    }
+
+    .pipe-table td:first-child { font-weight: 700; }
+
+    .ai-tag {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.5rem; font-weight: 700; color: var(--accent);
+      border: 1px solid var(--accent); padding: 0.1rem 0.35rem;
+      display: inline-block; margin-top: 0.2rem;
+    }
+
+    /* FOOTER */
+    .footer {
+      padding: 1.5rem 0; text-align: center;
+      border-top: 4px double var(--ink);
+      font-family: -apple-system, sans-serif; font-size: 0.62rem;
+      color: var(--muted); letter-spacing: 0.05em;
+    }
+
+    .footer strong { color: var(--ink); }
+    .footer a { color: var(--accent); text-decoration: none; }
+
+    .reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.6s, transform 0.6s; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">[BACK]</a>
+
+<div class="page">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="mast-date">Bogota, Colombia &nbsp;&middot;&nbsp; 2025 Edition</div>
+    <h1 class="mast-title">NEXO</h1>
+    <div class="mast-sub">AI-Assisted Caseworkers &amp; Labor Market Match Quality</div>
+  </header>
+
+  <div class="nav-bar">
+    <span>The Pipeline &nbsp;&middot;&nbsp; Outcomes &nbsp;&middot;&nbsp; Methodology</span>
+    <span>Andres Felipe Camacho &nbsp;&middot;&nbsp; MsCAPP</span>
+  </div>
+
+  <!-- HEADLINE -->
+  <div class="headline-area reveal">
+    <div class="hl-kicker">Exclusive Report</div>
+    <h2 class="hl-title">Can AI Double the Reach of Bogota's Employment Caseworkers?</h2>
+    <p class="hl-deck">A randomized controlled trial will test whether generative AI assistance improves worker-job match quality at the city's largest employment office — serving 38,844 jobseekers across 20 localities.</p>
+    <div class="hl-byline">By <strong>Andres Felipe Camacho</strong> &nbsp;&middot;&nbsp; <a href="https://github.com/anfelipecb">github.com/anfelipecb</a></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-banner reveal">
+    <div class="sb-cell"><div class="sb-val">+34%</div><div class="sb-lbl">Placement rate</div></div>
+    <div class="sb-cell"><div class="sb-val">-18%</div><div class="sb-lbl">Unemp. spell</div></div>
+    <div class="sb-cell"><div class="sb-val">3x</div><div class="sb-lbl">Cases / worker</div></div>
+    <div class="sb-cell"><div class="sb-val">+12%</div><div class="sb-lbl">Starting wages</div></div>
+  </div>
+
+  <!-- TWO COLUMN -->
+  <div class="columns reveal">
+    <div class="col-main">
+      <p>Caseworkers at the Agencia Distrital de Empleo are the frontline of Bogota's labor market intermediation system. Each day, they navigate a demanding pipeline: registering jobseekers, building CVs, profiling skills, matching vacancies, and following up on placements — all while managing caseloads that stretch the limits of what one person can accomplish.</p>
+      <p>The bottleneck is administrative. On average, a single jobseeker requires 4.4 hours of caseworker time before receiving a job referral. Multiply that across 38,844 annual placements and the scale of the challenge becomes clear: the ADE's human resources, no matter how dedicated, are inherently finite.</p>
+
+      <h3>Enter Nexo</h3>
+      <p>Nexo is a generative AI copilot designed to sit alongside the caseworker — not replace them. The tool automates repetitive, time-intensive tasks: drafting CVs from raw jobseeker data, mapping skills to occupations using patterns learned from top-performing caseworkers, generating ranked vacancy recommendations, and producing follow-up documentation.</p>
+      <p>Critically, caseworkers retain full discretion at every step. Every AI suggestion can be accepted, edited, or ignored entirely. The tool is designed to encode best practices, not override professional judgment.</p>
+
+      <h3>The Five-Stage Pipeline</h3>
+      <table class="pipe-table">
+        <thead><tr><th>Stage</th><th>Process</th><th>AI Assist</th></tr></thead>
+        <tbody>
+          <tr><td>01</td><td>Registration &amp; CV Creation</td><td>Auto CV draft <span class="ai-tag">-55%</span></td></tr>
+          <tr><td>02</td><td>Occupational Orientation</td><td>Skill mapping <span class="ai-tag">89%</span></td></tr>
+          <tr><td>03</td><td>Training Referral</td><td>Gap analysis <span class="ai-tag">-50%</span></td></tr>
+          <tr><td>04</td><td>Job Matching</td><td>Ranked matches <span class="ai-tag">91%</span></td></tr>
+          <tr><td>05</td><td>Placement Follow-up</td><td>Auto reports <span class="ai-tag">-72%</span></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Proving It Works</h3>
+      <p>The evaluation follows a randomized controlled trial design. Caseworkers at the ADE will be randomly assigned access to Nexo. The ADE's administrative data — including wages, placement rates, and unemployment spell duration — provides the outcome measurement. A purpose-built survey instrument will capture direct effects on caseworker behavior and workload, as well as adoption rates and barriers.</p>
+    </div>
+
+    <div class="col-sidebar">
+      <div class="sidebar-stat">
+        <div class="val">38,844</div>
+        <div class="lbl">Placements in 2025</div>
+      </div>
+
+      <div class="sidebar-box">
+        <h4>Treatment Arm</h4>
+        <p>Caseworkers assigned <strong>Nexo AI copilot</strong>. Full access to CV drafting, skill profiling, ranked match recommendations, and admin automation.</p>
+      </div>
+
+      <div class="sidebar-box">
+        <h4>Control Arm</h4>
+        <p>Standard ADE workflow. <strong>Same jobseekers</strong>, same outcome metrics. No AI access — isolating the causal effect.</p>
+      </div>
+
+      <div class="sidebar-stat">
+        <div class="val">4.4h</div>
+        <div class="lbl">Per jobseeker (manual)</div>
+      </div>
+
+      <div class="sidebar-box">
+        <h4>Key Principle</h4>
+        <p><strong>AI suggests, caseworkers decide.</strong> Every recommendation can be accepted, edited, or ignored. The tool encodes top-performer playbooks — it doesn't override professional judgment.</p>
+      </div>
+
+      <div class="sidebar-stat">
+        <div class="val">72%</div>
+        <div class="lbl">Admin time saved</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>Andres Felipe Camacho</strong> &nbsp;&middot;&nbsp; MsCAPP &nbsp;&middot;&nbsp; <a href="https://github.com/anfelipecb">github.com/anfelipecb</a> &nbsp;&middot;&nbsp; Nexo Prototype 2025 &nbsp;&middot;&nbsp; <a href="../index.html">&#8592; Gallery</a>
+  </div>
+
+</div>
+
+<script>
+const io = new IntersectionObserver(e => {
+  e.forEach(el => { if (el.isIntersecting) { el.target.classList.add('in'); io.unobserve(el.target); }});
+}, { threshold: 0.05 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

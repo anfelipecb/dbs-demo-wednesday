@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Kinetic Typography</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #020206;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .back {
+      position: fixed; top: 1rem; left: 1rem; z-index: 100;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.25); text-decoration: none;
+      padding: 0.3rem 0.7rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 99px;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+    }
+    .back:hover { color: #fff; }
+
+    #progress {
+      position: fixed; top: 0; left: 0; height: 2px;
+      background: linear-gradient(90deg, #06B6D4, #8B5CF6, #F59E0B, #10B981);
+      width: 0%; z-index: 200;
+    }
+
+    /* FRAME BASE */
+    .frame {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 2rem; position: relative; overflow: hidden;
+    }
+
+    .frame-content {
+      text-align: center; max-width: 1000px;
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.8s, transform 0.8s;
+    }
+
+    .frame-content.in { opacity: 1; transform: translateY(0); }
+
+    /* WORD ANIMATIONS */
+    .word-row {
+      display: flex; flex-wrap: wrap; align-items: baseline;
+      justify-content: center; gap: 0.5rem;
+    }
+
+    .word {
+      display: inline-block;
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .word.in { opacity: 1; transform: translateY(0); }
+
+    /* Frame 1 */
+    .f1-title {
+      font-size: clamp(6rem, 20vw, 16rem); font-weight: 900;
+      letter-spacing: -0.06em; line-height: 0.85;
+    }
+
+    .f1-gradient {
+      background: linear-gradient(135deg, #fff 0%, #06B6D4 50%, #8B5CF6 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .f1-sub {
+      font-size: clamp(0.8rem, 1.5vw, 1rem); color: rgba(255,255,255,0.35);
+      margin-top: 1.5rem; letter-spacing: 0.04em;
+    }
+
+    /* Frame 2: Scatter words */
+    .scatter-word {
+      position: absolute;
+      font-weight: 800; letter-spacing: -0.03em;
+      opacity: 0; transition: opacity 1s, transform 1s;
+    }
+
+    .scatter-word.in { opacity: 1; }
+
+    /* Frame 3: Column of numbers */
+    .num-line {
+      display: flex; align-items: baseline; justify-content: center; gap: 1.5rem;
+      margin: 0.75rem 0;
+      opacity: 0; transform: translateX(-30px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .num-line.in { opacity: 1; transform: translateX(0); }
+
+    .nl-val {
+      font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 900;
+      letter-spacing: -0.05em; line-height: 1;
+    }
+
+    .nl-label {
+      font-size: clamp(0.7rem, 1.5vw, 1rem); color: rgba(255,255,255,0.35);
+      text-align: left;
+    }
+
+    /* Frame 4: Two columns of words */
+    .vs-layout {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      gap: 2rem; max-width: 700px; width: 100%;
+    }
+
+    .vs-col { text-align: center; }
+
+    .vs-heading {
+      font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900;
+      letter-spacing: -0.04em; line-height: 1;
+    }
+
+    .vs-words {
+      margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem;
+    }
+
+    .vs-word {
+      font-size: 0.8rem; color: rgba(255,255,255,0.4);
+      opacity: 0; transition: opacity 0.4s;
+    }
+
+    .vs-word.in { opacity: 1; }
+
+    .vs-divider {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: rgba(255,255,255,0.15); font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    /* Frame 5: Pipeline kinetic */
+    .kinetic-pipe {
+      display: flex; flex-direction: column; gap: 0;
+      max-width: 600px; width: 100%;
+    }
+
+    .kp-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+      opacity: 0; transform: translateX(-20px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+
+    .kp-row.in { opacity: 1; transform: translateX(0); }
+
+    .kp-name {
+      font-size: clamp(1rem, 2.5vw, 1.5rem); font-weight: 700; letter-spacing: -0.02em;
+    }
+
+    .kp-chip {
+      font-size: 0.6rem; font-weight: 700; padding: 0.2rem 0.6rem;
+      border-radius: 99px; border: 1px solid;
+    }
+
+    /* Frame 6: Close */
+    .close-word {
+      font-size: clamp(3rem, 10vw, 8rem); font-weight: 900;
+      letter-spacing: -0.05em; line-height: 0.9;
+    }
+
+    .close-gradient {
+      background: linear-gradient(135deg, #06B6D4, #8B5CF6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .close-info {
+      margin-top: 2rem; font-size: 0.75rem; color: rgba(255,255,255,0.35);
+    }
+
+    .close-info a { color: #06B6D4; text-decoration: none; }
+
+    /* BG GLOW */
+    .glow {
+      position: absolute; border-radius: 50%; filter: blur(100px);
+      pointer-events: none; opacity: 0; transition: opacity 1.5s;
+    }
+
+    .frame-content.in ~ .glow, .frame.active .glow { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">&#8592; Gallery</a>
+<div id="progress"></div>
+
+<!-- F1: TITLE -->
+<section class="frame">
+  <div class="frame-content">
+    <div class="f1-title f1-gradient">Nexo</div>
+    <div class="f1-sub">AI copilot for employment caseworkers &nbsp;·&nbsp; Bogota</div>
+  </div>
+  <div class="glow" style="width:500px;height:500px;background:rgba(6,182,212,0.08);top:20%;left:30%;"></div>
+</section>
+
+<!-- F2: PROBLEM SCATTER -->
+<section class="frame" id="f-scatter">
+  <div class="frame-content">
+    <div class="word-row">
+      <span class="word" style="font-size:clamp(2rem,6vw,5rem);font-weight:900;letter-spacing:-0.04em;color:#06B6D4;">38,844</span>
+      <span class="word" style="font-size:clamp(1rem,2.5vw,1.5rem);color:rgba(255,255,255,0.4);">workers placed.</span>
+    </div>
+    <div class="word-row" style="margin-top:0.5rem;">
+      <span class="word" style="font-size:clamp(1rem,2.5vw,1.5rem);color:rgba(255,255,255,0.4);">One caseworker</span>
+      <span class="word" style="font-size:clamp(1.5rem,4vw,2.5rem);font-weight:800;">at a time.</span>
+    </div>
+    <div class="word-row" style="margin-top:2rem;">
+      <span class="word" style="font-size:clamp(0.7rem,1.5vw,0.9rem);color:rgba(255,255,255,0.2);">4.4 hours per jobseeker &nbsp;·&nbsp; 20 localities &nbsp;·&nbsp; every stage manual</span>
+    </div>
+  </div>
+  <div class="glow" style="width:400px;height:400px;background:rgba(6,182,212,0.06);bottom:20%;right:20%;"></div>
+</section>
+
+<!-- F3: THE QUESTION -->
+<section class="frame">
+  <div class="frame-content">
+    <div class="word-row">
+      <span class="word" style="font-size:clamp(1.5rem,4vw,3rem);color:rgba(255,255,255,0.4);">What if every caseworker had an</span>
+    </div>
+    <div class="word-row">
+      <span class="word" style="font-size:clamp(3rem,9vw,7rem);font-weight:900;letter-spacing:-0.04em;background:linear-gradient(135deg,#06B6D4,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">AI copilot?</span>
+    </div>
+  </div>
+  <div class="glow" style="width:500px;height:500px;background:rgba(139,92,246,0.07);top:30%;left:20%;"></div>
+</section>
+
+<!-- F4: NUMBERS -->
+<section class="frame">
+  <div class="frame-content">
+    <div class="num-line"><div class="nl-val" style="color:#06B6D4;">+34%</div><div class="nl-label">placement<br>rate</div></div>
+    <div class="num-line"><div class="nl-val" style="color:#8B5CF6;">&#8722;18%</div><div class="nl-label">unemployment<br>spell</div></div>
+    <div class="num-line"><div class="nl-val" style="color:#10B981;">3&times;</div><div class="nl-label">cases per<br>caseworker</div></div>
+    <div class="num-line"><div class="nl-val" style="color:#F59E0B;">+12%</div><div class="nl-label">starting<br>wages</div></div>
+  </div>
+</section>
+
+<!-- F5: PIPELINE -->
+<section class="frame">
+  <div class="frame-content" style="width:100%;max-width:600px;">
+    <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:2rem;">The Pipeline</div>
+    <div class="kinetic-pipe">
+      <div class="kp-row"><span class="kp-name">Registration &amp; CV</span><span class="kp-chip" style="color:#06B6D4;border-color:rgba(6,182,212,0.3);">&#8722;55%</span></div>
+      <div class="kp-row"><span class="kp-name">Occupational Orientation</span><span class="kp-chip" style="color:#8B5CF6;border-color:rgba(139,92,246,0.3);">89% match</span></div>
+      <div class="kp-row"><span class="kp-name">Training Referral</span><span class="kp-chip" style="color:#F59E0B;border-color:rgba(245,158,11,0.3);">&#8722;50%</span></div>
+      <div class="kp-row"><span class="kp-name">Job Matching</span><span class="kp-chip" style="color:#10B981;border-color:rgba(16,185,129,0.3);">91% accuracy</span></div>
+      <div class="kp-row"><span class="kp-name">Placement Follow-up</span><span class="kp-chip" style="color:#F43F5E;border-color:rgba(244,63,94,0.3);">&#8722;72% admin</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- F6: VS -->
+<section class="frame">
+  <div class="frame-content">
+    <div class="vs-layout">
+      <div class="vs-col">
+        <div class="vs-heading" style="color:#06B6D4;">Treatment</div>
+        <div class="vs-words">
+          <div class="vs-word">Nexo AI copilot</div>
+          <div class="vs-word">CV drafting</div>
+          <div class="vs-word">Skill profiling</div>
+          <div class="vs-word">Job matching</div>
+          <div class="vs-word">Admin automation</div>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-col">
+        <div class="vs-heading" style="color:rgba(255,255,255,0.2);">Control</div>
+        <div class="vs-words">
+          <div class="vs-word">Standard workflow</div>
+          <div class="vs-word">Same jobseekers</div>
+          <div class="vs-word">Same outcomes</div>
+          <div class="vs-word">No AI access</div>
+          <div class="vs-word">Causal isolation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="glow" style="width:400px;height:400px;background:rgba(6,182,212,0.05);top:40%;left:15%;"></div>
+  <div class="glow" style="width:300px;height:300px;background:rgba(139,92,246,0.04);bottom:20%;right:15%;"></div>
+</section>
+
+<!-- F7: CLOSE -->
+<section class="frame">
+  <div class="frame-content">
+    <div class="close-word">Empowering</div>
+    <div class="close-word close-gradient">every caseworker</div>
+    <div class="close-word">with AI.</div>
+    <div class="close-info">
+      <strong style="color:#fff;">Andres Felipe Camacho</strong> &nbsp;·&nbsp; MsCAPP &nbsp;·&nbsp; <a href="https://github.com/anfelipecb">github.com/anfelipecb</a>
+    </div>
+  </div>
+</section>
+
+<script>
+// Progress bar
+const bar = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+  bar.style.width = pct + '%';
+}, { passive: true });
+
+// Frame reveal
+const frames = document.querySelectorAll('.frame-content');
+const fio = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+
+      // Stagger words
+      e.target.querySelectorAll('.word').forEach((w, i) => {
+        setTimeout(() => w.classList.add('in'), i * 150);
+      });
+
+      // Stagger num-lines
+      e.target.querySelectorAll('.num-line').forEach((n, i) => {
+        setTimeout(() => n.classList.add('in'), i * 200);
+      });
+
+      // Stagger pipeline rows
+      e.target.querySelectorAll('.kp-row').forEach((r, i) => {
+        setTimeout(() => r.classList.add('in'), i * 120);
+      });
+
+      // Stagger vs words
+      e.target.querySelectorAll('.vs-word').forEach((w, i) => {
+        setTimeout(() => w.classList.add('in'), 300 + i * 100);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+frames.forEach(f => fio.observe(f));
+</script>
+</body>
+</html>

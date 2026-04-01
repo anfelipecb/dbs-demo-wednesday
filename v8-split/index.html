@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Split Scrollytelling</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root { --bg: #080C14; --text: #F1F5F9; --muted: #64748B; --cyan: #06B6D4; --violet: #8B5CF6; --emerald: #10B981; --amber: #F59E0B; --border: rgba(255,255,255,0.06); }
+
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+
+    .back {
+      position: fixed; top: 1rem; left: 1rem; z-index: 100;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none;
+      padding: 0.3rem 0.7rem; border: 1px solid var(--border); border-radius: 99px;
+      background: rgba(8,12,20,0.8); backdrop-filter: blur(12px);
+    }
+    .back:hover { color: var(--text); }
+
+    /* HERO */
+    .hero {
+      height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      position: relative; overflow: hidden;
+    }
+
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 30%, rgba(6,182,212,0.1) 0%, transparent 60%);
+    }
+
+    .hero-logo {
+      font-size: clamp(5rem, 14vw, 10rem); font-weight: 900;
+      letter-spacing: -0.06em; line-height: 0.85; position: relative;
+      background: linear-gradient(135deg, #fff, var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .hero-sub { font-size: 1rem; color: var(--muted); margin-top: 1rem; max-width: 400px; }
+    .hero-sub strong { color: var(--text); font-weight: 500; }
+
+    /* SCROLLYTELLING SPLIT */
+    .split-container {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 100vh; position: relative;
+    }
+
+    @media (max-width: 768px) {
+      .split-container { grid-template-columns: 1fr; }
+      .viz-pane { display: none; }
+    }
+
+    /* LEFT: STORY */
+    .story-pane {
+      padding: 0 2.5rem; position: relative; z-index: 2;
+      border-right: 1px solid var(--border);
+    }
+
+    .story-block {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; padding: 4rem 0;
+      opacity: 0.25; transition: opacity 0.5s;
+    }
+
+    .story-block.active { opacity: 1; }
+
+    .story-tag {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; margin-bottom: 0.75rem;
+    }
+
+    .story-title {
+      font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 800;
+      letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1rem;
+    }
+
+    .story-body { font-size: 0.88rem; color: var(--muted); line-height: 1.75; max-width: 400px; }
+    .story-body strong { color: var(--text); }
+
+    .story-stat {
+      margin-top: 1.5rem; padding: 1rem; border-radius: 10px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.02);
+      display: inline-flex; align-items: center; gap: 1rem;
+    }
+
+    .ss-val { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+    .ss-lbl { font-size: 0.65rem; color: var(--muted); line-height: 1.4; }
+
+    /* RIGHT: VISUALIZATION */
+    .viz-pane {
+      position: sticky; top: 0; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem; overflow: hidden;
+    }
+
+    .viz-scene {
+      position: absolute; inset: 2rem;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: scale(0.95);
+      transition: opacity 0.6s, transform 0.6s;
+      pointer-events: none;
+    }
+
+    .viz-scene.active { opacity: 1; transform: scale(1); pointer-events: auto; }
+
+    /* VIZ 1: Big Number */
+    .viz-bignum { text-align: center; }
+    .viz-bignum .num {
+      font-size: clamp(6rem, 16vw, 12rem); font-weight: 900;
+      letter-spacing: -0.06em; line-height: 0.85;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .viz-bignum .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.5rem; }
+
+    /* VIZ 2: Animated Bars */
+    .viz-bars { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 1rem; }
+
+    .vb-row { display: flex; flex-direction: column; gap: 0.35rem; }
+    .vb-label { font-size: 0.65rem; color: var(--muted); display: flex; justify-content: space-between; }
+    .vb-label .val { color: var(--text); font-weight: 700; }
+    .vb-track { height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden; }
+    .vb-fill { height: 100%; border-radius: 99px; width: 0%; transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
+
+    /* VIZ 3: Split Treatment/Control */
+    .viz-split { display: flex; gap: 1.5rem; width: 100%; max-width: 380px; }
+
+    .vs-arm {
+      flex: 1; padding: 1.5rem; border-radius: 14px; text-align: center;
+    }
+
+    .vs-treatment { background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2); }
+    .vs-control { background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
+
+    .vs-tag { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .vs-treatment .vs-tag { color: var(--cyan); }
+    .vs-control .vs-tag { color: var(--muted); }
+    .vs-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .vs-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .vs-desc { font-size: 0.65rem; color: var(--muted); line-height: 1.5; }
+
+    /* VIZ 4: Stats Grid */
+    .viz-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 350px; }
+
+    .vs-card {
+      padding: 1.5rem; border-radius: 14px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      text-align: center; opacity: 0; transform: translateY(10px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+
+    .vs-card.show { opacity: 1; transform: translateY(0); }
+
+    .vs-card .val {
+      font-size: 2rem; font-weight: 900; letter-spacing: -0.04em; line-height: 1;
+    }
+
+    .vs-card .lbl {
+      font-size: 0.58rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-top: 0.3rem;
+    }
+
+    /* VIZ 5: Pipeline mini */
+    .viz-pipe { display: flex; flex-direction: column; gap: 0; max-width: 280px; width: 100%; }
+
+    .vp-step {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 0; border-bottom: 1px solid var(--border);
+      opacity: 0; transform: translateX(-10px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+
+    .vp-step.show { opacity: 1; transform: translateX(0); }
+
+    .vp-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; font-weight: 800; flex-shrink: 0;
+    }
+
+    .vp-name { font-size: 0.72rem; font-weight: 600; flex: 1; }
+    .vp-time { font-size: 0.6rem; font-weight: 700; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 2rem 2.5rem;
+      font-size: 0.7rem; display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; color: var(--muted);
+    }
+
+    footer strong { color: var(--text); }
+    footer a { color: var(--cyan); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">&#8592; Gallery</a>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-logo">Nexo</div>
+  <p class="hero-sub"><strong>AI copilot for caseworkers.</strong> Scroll to explore the story &darr;</p>
+</div>
+
+<!-- SPLIT SCROLLYTELLING -->
+<div class="split-container">
+
+  <!-- LEFT: NARRATIVE -->
+  <div class="story-pane">
+
+    <div class="story-block" data-viz="0">
+      <div class="story-tag" style="color:var(--cyan);">The Scale</div>
+      <h2 class="story-title">38,844 workers placed in a single year</h2>
+      <p class="story-body">The Agencia Distrital de Empleo is Bogota's public employment office, serving all <strong>20 localities</strong>. Every placement flows through a caseworker.</p>
+      <div class="story-stat">
+        <div class="ss-val" style="color:var(--cyan);">38,844</div>
+        <div class="ss-lbl">Workers placed<br>in 2025</div>
+      </div>
+    </div>
+
+    <div class="story-block" data-viz="1">
+      <div class="story-tag" style="color:var(--violet);">The Pipeline</div>
+      <h2 class="story-title">Five stages. 4.4 hours per jobseeker.</h2>
+      <p class="story-body">From registration to placement, each jobseeker passes through a <strong>multi-stage pipeline</strong>. Every stage demands caseworker time — the bottleneck that limits scale.</p>
+    </div>
+
+    <div class="story-block" data-viz="2">
+      <div class="story-tag" style="color:var(--amber);">The Solution</div>
+      <h2 class="story-title">Nexo: AI that amplifies, not replaces</h2>
+      <p class="story-body">Nexo drafts CVs, maps skills, ranks job matches, and automates admin tasks. <strong>Caseworkers retain full discretion</strong> — they accept, edit, or ignore every suggestion.</p>
+    </div>
+
+    <div class="story-block" data-viz="3">
+      <div class="story-tag" style="color:var(--emerald);">The Impact</div>
+      <h2 class="story-title">Projected outcomes from the AI copilot</h2>
+      <p class="story-body">Based on comparable interventions in the literature, Nexo is projected to <strong>increase placement rates by 34%</strong>, cut unemployment spells, and triple caseworker throughput.</p>
+    </div>
+
+    <div class="story-block" data-viz="4">
+      <div class="story-tag" style="color:var(--cyan);">The Method</div>
+      <h2 class="story-title">A randomized controlled trial</h2>
+      <p class="story-body">Caseworkers are <strong>randomly assigned</strong> access to Nexo. Outcomes tracked via ADE administrative records: wages, placement rates, unemployment duration.</p>
+      <div class="story-stat">
+        <div class="ss-val" style="color:var(--cyan);">RCT</div>
+        <div class="ss-lbl">Causal identification<br>of AI impact</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: VISUALIZATIONS -->
+  <div class="viz-pane">
+
+    <!-- VIZ 0: Big Number -->
+    <div class="viz-scene active" data-viz-id="0">
+      <div class="viz-bignum">
+        <div class="num">38,844</div>
+        <div class="lbl">Placements in 2025</div>
+      </div>
+    </div>
+
+    <!-- VIZ 1: Pipeline Steps -->
+    <div class="viz-scene" data-viz-id="1">
+      <div class="viz-pipe" id="pipe-viz">
+        <div class="vp-step"><div class="vp-dot" style="background:rgba(6,182,212,0.15);color:var(--cyan);">1</div><span class="vp-name">Registration &amp; CV</span><span class="vp-time" style="color:var(--cyan);">45 min</span></div>
+        <div class="vp-step"><div class="vp-dot" style="background:rgba(139,92,246,0.15);color:#A78BFA;">2</div><span class="vp-name">Occupational Orient.</span><span class="vp-time" style="color:#A78BFA;">60 min</span></div>
+        <div class="vp-step"><div class="vp-dot" style="background:rgba(245,158,11,0.15);color:#FCD34D;">3</div><span class="vp-name">Training Referral</span><span class="vp-time" style="color:#FCD34D;">30 min</span></div>
+        <div class="vp-step"><div class="vp-dot" style="background:rgba(16,185,129,0.15);color:#34D399;">4</div><span class="vp-name">Job Matching</span><span class="vp-time" style="color:#34D399;">90 min</span></div>
+        <div class="vp-step"><div class="vp-dot" style="background:rgba(244,63,94,0.15);color:#FDA4AF;">5</div><span class="vp-name">Follow-up</span><span class="vp-time" style="color:#FDA4AF;">40 min</span></div>
+        <div class="vp-step" style="border-bottom:2px solid var(--text);"><div class="vp-dot" style="background:rgba(255,255,255,0.06);color:var(--text);">&#8721;</div><span class="vp-name" style="font-weight:800;">Total</span><span class="vp-time" style="color:var(--text);font-size:0.75rem;">4.4 hrs</span></div>
+      </div>
+    </div>
+
+    <!-- VIZ 2: Capability Bars -->
+    <div class="viz-scene" data-viz-id="2">
+      <div class="viz-bars" id="cap-bars">
+        <div class="vb-row"><div class="vb-label"><span>CV Drafting</span><span class="val">94%</span></div><div class="vb-track"><div class="vb-fill" data-w="94" style="background:linear-gradient(90deg,var(--cyan),var(--violet));"></div></div></div>
+        <div class="vb-row"><div class="vb-label"><span>Skill Profiling</span><span class="val">89%</span></div><div class="vb-track"><div class="vb-fill" data-w="89" style="background:linear-gradient(90deg,var(--violet),#A78BFA);"></div></div></div>
+        <div class="vb-row"><div class="vb-label"><span>Job Matching</span><span class="val">91%</span></div><div class="vb-track"><div class="vb-fill" data-w="91" style="background:linear-gradient(90deg,var(--emerald),var(--cyan));"></div></div></div>
+        <div class="vb-row"><div class="vb-label"><span>Training Rec.</span><span class="val">76%</span></div><div class="vb-track"><div class="vb-fill" data-w="76" style="background:linear-gradient(90deg,var(--amber),var(--emerald));"></div></div></div>
+        <div class="vb-row"><div class="vb-label"><span>Admin Automation</span><span class="val">72%</span></div><div class="vb-track"><div class="vb-fill" data-w="72" style="background:linear-gradient(90deg,#FDA4AF,var(--amber));"></div></div></div>
+      </div>
+    </div>
+
+    <!-- VIZ 3: Stats Grid -->
+    <div class="viz-scene" data-viz-id="3">
+      <div class="viz-stats" id="stats-viz">
+        <div class="vs-card"><div class="val" style="color:var(--cyan);">+34%</div><div class="lbl">Placement rate</div></div>
+        <div class="vs-card"><div class="val" style="color:var(--violet);">-18%</div><div class="lbl">Unemp. spell</div></div>
+        <div class="vs-card"><div class="val" style="color:var(--emerald);">3x</div><div class="lbl">Cases / worker</div></div>
+        <div class="vs-card"><div class="val" style="color:var(--amber);">+12%</div><div class="lbl">Starting wages</div></div>
+      </div>
+    </div>
+
+    <!-- VIZ 4: Treatment vs Control -->
+    <div class="viz-scene" data-viz-id="4">
+      <div class="viz-split">
+        <div class="vs-arm vs-treatment">
+          <div class="vs-tag">Treatment</div>
+          <div class="vs-icon">&#9670;</div>
+          <div class="vs-name">Nexo AI</div>
+          <div class="vs-desc">Full AI copilot access. CV drafting, matching, admin.</div>
+        </div>
+        <div class="vs-arm vs-control">
+          <div class="vs-tag">Control</div>
+          <div class="vs-icon">&#9711;</div>
+          <div class="vs-name">Standard</div>
+          <div class="vs-desc">Same jobseekers, same metrics. No AI access.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div><strong>Andres Felipe Camacho</strong> &nbsp;·&nbsp; MsCAPP &nbsp;·&nbsp; <a href="https://github.com/anfelipecb">github.com/anfelipecb</a></div>
+  <div>Nexo &nbsp;·&nbsp; 2025 &nbsp;·&nbsp; <a href="../index.html">&#8592; Gallery</a></div>
+</footer>
+
+<script>
+// SCROLLYTELLING: activate story blocks + swap viz scenes
+const blocks = document.querySelectorAll('.story-block');
+const scenes = document.querySelectorAll('.viz-scene');
+let activeViz = 0;
+
+function setViz(idx) {
+  if (idx === activeViz) return;
+  activeViz = idx;
+  scenes.forEach(s => s.classList.toggle('active', +s.dataset.vizId === idx));
+
+  // Trigger animations in newly active scene
+  const active = document.querySelector(`.viz-scene[data-viz-id="${idx}"]`);
+  if (!active) return;
+
+  // Bar fills
+  active.querySelectorAll('.vb-fill').forEach(el => { el.style.width = el.dataset.w + '%'; });
+
+  // Pipeline steps stagger
+  active.querySelectorAll('.vp-step').forEach((el, i) => {
+    setTimeout(() => el.classList.add('show'), i * 100);
+  });
+
+  // Stats cards stagger
+  active.querySelectorAll('.vs-card').forEach((el, i) => {
+    setTimeout(() => el.classList.add('show'), i * 120);
+  });
+}
+
+const blockIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('active');
+      setViz(+e.target.dataset.viz);
+    } else {
+      e.target.classList.remove('active');
+    }
+  });
+}, { threshold: 0.5, rootMargin: '-20% 0px -20% 0px' });
+
+blocks.forEach(b => blockIO.observe(b));
+</script>
+</body>
+</html>

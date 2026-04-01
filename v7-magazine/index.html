@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Magazine</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root { --ink: #111; --muted: #777; --accent: #1D4ED8; --bg: #fff; --warm: #FBF8F3; --rule: #E0DDD5; }
+
+    body { background: var(--bg); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; }
+
+    .back-link {
+      position: fixed; top: 1rem; left: 1rem; z-index: 100;
+      font-family: -apple-system, sans-serif;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none;
+      padding: 0.3rem 0.7rem; border: 1px solid var(--rule); border-radius: 3px;
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(8px);
+    }
+    .back-link:hover { color: var(--ink); border-color: var(--ink); }
+
+    .sans { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; }
+
+    /* HERO COVER */
+    .cover {
+      min-height: 100vh; display: grid;
+      grid-template-columns: 1fr 1fr; position: relative;
+    }
+
+    @media (max-width: 700px) { .cover { grid-template-columns: 1fr; } }
+
+    .cover-left {
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 3rem; border-right: 1px solid var(--rule);
+    }
+
+    .cover-kicker {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 2rem;
+    }
+
+    .cover-title {
+      font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700;
+      letter-spacing: -0.03em; line-height: 1; margin-bottom: 1.5rem;
+    }
+
+    .cover-title em { font-style: italic; color: var(--accent); }
+
+    .cover-deck {
+      font-size: 1.15rem; line-height: 1.65; color: var(--muted);
+      max-width: 450px; margin-bottom: 2.5rem;
+    }
+
+    .cover-byline {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.72rem; font-weight: 600; color: var(--ink);
+    }
+
+    .cover-byline a { color: var(--accent); text-decoration: none; }
+
+    .cover-right {
+      background: var(--warm); display: flex;
+      align-items: center; justify-content: center; padding: 3rem;
+      position: relative; overflow: hidden;
+    }
+
+    .cover-stat {
+      text-align: center;
+    }
+
+    .cover-stat .num {
+      font-size: clamp(5rem, 14vw, 10rem); font-weight: 700;
+      letter-spacing: -0.06em; line-height: 0.85; color: var(--ink);
+    }
+
+    .cover-stat .caption {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.68rem; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-top: 0.75rem; font-weight: 600;
+    }
+
+    /* TICKER */
+    .ticker {
+      background: var(--ink); color: var(--bg); overflow: hidden;
+      padding: 0.75rem 0; font-family: -apple-system, sans-serif;
+    }
+
+    .ticker-inner {
+      display: flex; gap: 3rem; white-space: nowrap;
+      animation: scroll 18s linear infinite;
+    }
+
+    .ticker-item {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; flex-shrink: 0; display: flex;
+      align-items: center; gap: 0.75rem;
+    }
+
+    .ticker-val { font-weight: 800; font-size: 0.8rem; }
+    .ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.25); }
+
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* CONTENT */
+    .page { max-width: 1000px; margin: 0 auto; padding: 0 2rem; }
+
+    /* MULTI-COLUMN INTRO */
+    .multi-intro {
+      padding: 4rem 0; border-bottom: 1px solid var(--rule);
+      columns: 2; column-gap: 3rem; column-rule: 1px solid var(--rule);
+    }
+
+    @media (max-width: 600px) { .multi-intro { columns: 1; } }
+
+    .multi-intro p {
+      font-size: 0.95rem; line-height: 1.85; margin-bottom: 1rem;
+    }
+
+    .multi-intro p:first-child::first-letter {
+      font-size: 3.5rem; float: left; line-height: 0.8;
+      margin-right: 0.5rem; margin-top: 0.1rem; font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* PULL STAT */
+    .pull-stat {
+      padding: 4rem 0; text-align: center; border-bottom: 1px solid var(--rule);
+    }
+
+    .pull-stat .value {
+      font-size: clamp(3rem, 8vw, 6rem); font-weight: 700;
+      letter-spacing: -0.04em; color: var(--accent); line-height: 1;
+    }
+
+    .pull-stat .desc {
+      font-size: 1rem; color: var(--muted); margin-top: 0.5rem;
+      max-width: 400px; margin-left: auto; margin-right: auto;
+    }
+
+    /* PIPELINE MAGAZINE */
+    .pipeline-mag {
+      padding: 4rem 0; border-bottom: 1px solid var(--rule);
+    }
+
+    .pm-head {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 3rem; padding-bottom: 1rem; border-bottom: 2px solid var(--ink);
+    }
+
+    .pm-title {
+      font-size: 2rem; font-weight: 700; letter-spacing: -0.03em;
+    }
+
+    .pm-sub { font-family: -apple-system, sans-serif; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+    .pm-grid { display: flex; flex-direction: column; gap: 0; }
+
+    .pm-row {
+      display: grid; grid-template-columns: 50px 1fr 180px;
+      gap: 2rem; padding: 1.5rem 0;
+      border-bottom: 1px solid var(--rule); align-items: start;
+    }
+
+    @media (max-width: 600px) { .pm-row { grid-template-columns: 1fr; gap: 0.5rem; } }
+
+    .pm-num {
+      font-family: -apple-system, sans-serif;
+      font-size: 2rem; font-weight: 900; color: var(--rule); line-height: 1;
+    }
+
+    .pm-content {}
+
+    .pm-stage {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.2rem;
+    }
+
+    .pm-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; letter-spacing: -0.02em; }
+    .pm-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+    .pm-ai {
+      font-family: -apple-system, sans-serif;
+      padding: 0.75rem; background: var(--warm); border-radius: 4px;
+      border-left: 3px solid var(--accent);
+    }
+
+    .pm-ai-tag {
+      font-size: 0.55rem; font-weight: 700; color: var(--accent);
+      letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.3rem;
+    }
+
+    .pm-ai-text { font-size: 0.72rem; color: var(--muted); line-height: 1.5; }
+
+    /* RCT SECTION */
+    .rct-section {
+      padding: 4rem 0; border-bottom: 1px solid var(--rule);
+    }
+
+    .rct-head {
+      text-align: center; margin-bottom: 3rem;
+    }
+
+    .rct-title { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.03em; }
+    .rct-deck { font-size: 0.95rem; color: var(--muted); margin-top: 0.5rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+    .rct-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+    @media (max-width: 600px) { .rct-cols { grid-template-columns: 1fr; gap: 2rem; } }
+
+    .rct-col h3 {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem; border-bottom: 2px solid var(--ink);
+    }
+
+    .rct-col.control h3 { color: var(--muted); }
+
+    .rct-col p { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .rct-col p strong { color: var(--ink); }
+
+    /* OUTCOMES */
+    .outcomes {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-top: 2px solid var(--ink);
+    }
+
+    @media (max-width: 600px) { .outcomes { grid-template-columns: repeat(2, 1fr); } }
+
+    .oc {
+      padding: 2.5rem 1.5rem; border-right: 1px solid var(--rule);
+      text-align: center;
+    }
+
+    .oc:last-child { border-right: none; }
+
+    .oc-val {
+      font-size: 2.5rem; font-weight: 700; letter-spacing: -0.04em;
+      color: var(--accent); line-height: 1;
+    }
+
+    .oc-lbl {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.6rem; color: var(--muted); margin-top: 0.4rem;
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 3rem 0; display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+      font-family: -apple-system, sans-serif; font-size: 0.7rem;
+    }
+
+    footer strong { color: var(--ink); }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s, transform 0.7s; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<a class="back-link" href="../index.html">&#8592; Gallery</a>
+
+<!-- COVER -->
+<header class="cover">
+  <div class="cover-left">
+    <div class="cover-kicker sans">Prototype &nbsp;·&nbsp; 2025</div>
+    <h1 class="cover-title">AI-Assisted<br>Caseworkers and<br><em>Labor Market</em><br>Match Quality</h1>
+    <p class="cover-deck">A randomized controlled trial measuring how AI assistance improves the speed and quality of worker-job matches at Bogota's public employment services.</p>
+    <div class="cover-byline">Andres Felipe Camacho &nbsp;·&nbsp; MsCAPP &nbsp;·&nbsp; <a href="https://github.com/anfelipecb">github.com/anfelipecb</a></div>
+  </div>
+  <div class="cover-right">
+    <div class="cover-stat">
+      <div class="num">38,844</div>
+      <div class="caption">Workers placed in 2025</div>
+    </div>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <div class="ticker-item"><span class="ticker-val">38,844</span> placements</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">20</span> localities</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">+34%</span> placement uplift</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">72%</span> admin saved</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">3x</span> more cases</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">38,844</span> placements</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">20</span> localities</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">+34%</span> placement uplift</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">72%</span> admin saved</div><div class="ticker-dot"></div>
+    <div class="ticker-item"><span class="ticker-val">3x</span> more cases</div><div class="ticker-dot"></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- MULTI-COLUMN INTRO -->
+  <div class="multi-intro reveal">
+    <p>Caseworkers are the primary resource for public employment services to help unemployed individuals find jobs. They are expected to deliver individualized, personalized support to a large and diverse pool of jobseekers. However, doing this at scale through human caseworkers alone is inherently limited.</p>
+    <p>Nexo leverages generative AI technologies to assist caseworkers in simplifying time-intensive administrative tasks. This allows them to focus on complex, non-routine work where they have the most value — management, social skills, and communication — tasks that cannot easily be replicated by AI.</p>
+    <p>Importantly, caseworkers retain full discretion to accept, edit, or ignore all suggestions. The tool encodes the best practices of top-performing caseworkers in a form that can then be delivered to other agents across the system.</p>
+  </div>
+
+  <!-- PULL STAT -->
+  <div class="pull-stat reveal">
+    <div class="value">4.4 hrs</div>
+    <div class="desc">Average caseworker time per jobseeker under the current manual workflow</div>
+  </div>
+
+  <!-- PIPELINE -->
+  <section class="pipeline-mag reveal">
+    <div class="pm-head">
+      <h2 class="pm-title">The Pipeline</h2>
+      <span class="pm-sub sans">ADE Caseworker Action Path</span>
+    </div>
+    <div class="pm-grid">
+      <div class="pm-row">
+        <div class="pm-num sans">01</div>
+        <div class="pm-content">
+          <div class="pm-stage sans">Stage One</div>
+          <div class="pm-name">Registration &amp; CV Creation</div>
+          <div class="pm-desc">Jobseeker registered in the national employment database. Caseworker collects personal details, work history, and documents.</div>
+        </div>
+        <div class="pm-ai"><div class="pm-ai-tag sans">Nexo AI</div><div class="pm-ai-text">Auto-drafts structured CVs. Saves ~40 min per case.</div></div>
+      </div>
+      <div class="pm-row">
+        <div class="pm-num sans">02</div>
+        <div class="pm-content">
+          <div class="pm-stage sans">Stage Two</div>
+          <div class="pm-name">Occupational Orientation</div>
+          <div class="pm-desc">Skills, competencies, and interests profiled through interviews and assessments.</div>
+        </div>
+        <div class="pm-ai"><div class="pm-ai-tag sans">Nexo AI</div><div class="pm-ai-text">Skill mapping from top-caseworker playbooks.</div></div>
+      </div>
+      <div class="pm-row">
+        <div class="pm-num sans">03</div>
+        <div class="pm-content">
+          <div class="pm-stage sans">Stage Three</div>
+          <div class="pm-name">Training &amp; Skills Gap</div>
+          <div class="pm-desc">Referral to training programs and certifications to close identified gaps.</div>
+        </div>
+        <div class="pm-ai"><div class="pm-ai-tag sans">Nexo AI</div><div class="pm-ai-text">Shortest-path training recommendations.</div></div>
+      </div>
+      <div class="pm-row">
+        <div class="pm-num sans">04</div>
+        <div class="pm-content">
+          <div class="pm-stage sans">Stage Four</div>
+          <div class="pm-name">Job Matching &amp; Referral</div>
+          <div class="pm-desc">Core matching. Caseworker identifies vacancies aligned with jobseeker profile and employer requirements.</div>
+        </div>
+        <div class="pm-ai"><div class="pm-ai-tag sans">Nexo AI</div><div class="pm-ai-text">Ranked match recommendations — 91% accuracy.</div></div>
+      </div>
+      <div class="pm-row">
+        <div class="pm-num sans">05</div>
+        <div class="pm-content">
+          <div class="pm-stage sans">Stage Five</div>
+          <div class="pm-name">Placement &amp; Follow-up</div>
+          <div class="pm-desc">Post-placement tracking of wages, retention, and contract outcomes.</div>
+        </div>
+        <div class="pm-ai"><div class="pm-ai-tag sans">Nexo AI</div><div class="pm-ai-text">Auto-generated follow-ups and reports. 72% admin reduction.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTCOMES -->
+  <div class="outcomes reveal">
+    <div class="oc"><div class="oc-val">+34%</div><div class="oc-lbl">Placement rate</div></div>
+    <div class="oc"><div class="oc-val">-18%</div><div class="oc-lbl">Unemployment spell</div></div>
+    <div class="oc"><div class="oc-val">3x</div><div class="oc-lbl">Cases / worker</div></div>
+    <div class="oc"><div class="oc-val">+12%</div><div class="oc-lbl">Starting wages</div></div>
+  </div>
+
+  <!-- RCT -->
+  <section class="rct-section reveal">
+    <div class="rct-head">
+      <h2 class="rct-title">The Method</h2>
+      <p class="rct-deck">A randomized controlled trial at the Agencia Distrital de Empleo, Bogota.</p>
+    </div>
+    <div class="rct-cols">
+      <div class="rct-col treatment">
+        <h3>Treatment Arm</h3>
+        <p>Caseworkers assigned <strong>Nexo AI copilot</strong>. Full access to CV drafting, skill profiling, match recommendations, and admin automation. Human discretion retained at every step.</p>
+      </div>
+      <div class="rct-col control">
+        <h3>Control Arm</h3>
+        <p>Caseworkers operate under <strong>standard ADE workflow</strong>. Same jobseeker population, same outcome tracking — isolating the causal effect of AI access on match quality.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div><strong>Andres Felipe Camacho</strong> &nbsp;·&nbsp; MsCAPP &nbsp;·&nbsp; <a href="https://github.com/anfelipecb">github.com/anfelipecb</a></div>
+    <div style="color:var(--muted);">Nexo &nbsp;·&nbsp; 2025 &nbsp;·&nbsp; <a href="../index.html">&#8592; Gallery</a></div>
+  </footer>
+
+</div>
+
+<script>
+const io = new IntersectionObserver(e => {
+  e.forEach(el => { if (el.isIntersecting) { el.target.classList.add('in'); io.unobserve(el.target); }});
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
