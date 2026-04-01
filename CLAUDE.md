@@ -2,9 +2,7 @@
 
 ## What This Is
 
-Interactive demo site for a grant proposal to the **Bogota Economic Development Office** (Oficina de Desarrollo Económico, Alcaldía de Bogotá). The proposal is for a **randomized controlled trial** testing whether AI assistance improves employment caseworker performance at the **Agencia Distrital de Empleo (ADE)**.
-
-The product is called **Nexo** — an AI copilot for ADE caseworkers. Not a direct job-matching app. The caseworker is the AI user; the jobseeker is the beneficiary.
+Interactive demo site prototyping an AI caseworker copilot called **Nexo** for the **Agencia Distrital de Empleo (ADE)** in Bogota. Built through **25 design iterations** exploring different visual styles, interactions, and storytelling approaches — converging toward a final version.
 
 Live: **https://dbs-demo-wednesday.vercel.app**
 GitHub: **https://github.com/anfelipecb/dbs-demo-wednesday**
@@ -19,126 +17,139 @@ This is a solo prototype. No co-authors appear on any page.
 
 ---
 
-## Research Context (from proposal)
+## Design Process — 25 Versions in 5 Batches
 
-**Research question:** Does providing PES caseworkers with a generative AI assistant improve the quality and speed of worker-job matches? Can AI assistance expand administrative capacity and scale programs?
+### Batch 1 — Initial Exploration (V1–V5)
+**Goal:** Go wide. 5 radically different landing page styles.
+- V1: Dark Apple-style teardown with 3D exploding cards
+- V2: Pipeline journey with vertical spine and alternating steps
+- V3: Civic data dashboard (Bloomberg-style) with charts and locality heatmap
+- V4: Light academic editorial (serif, print-like policy brief)
+- V5: Cinematic snap-scroll with full-viewport sections and giant typography
 
-**Field partner:** Agencia Distrital de Empleo (ADE) — Bogotá's main public employment services office.
+**User feedback:** Liked V2's pipeline, V1's teardown, V3's animated figures, V5's scroll color changes and icons. Wanted story + data pane, more movement, and light versions.
 
-**Real stat to use:** 38,844 placements in 2025 (verified ADE figure).
+### Batch 2 — Wide Exploration (V6–V11)
+**Goal:** Still diverging. Explored extreme styles informed by batch 1 feedback.
+- V6: Brutalist (monospace, neon green, ASCII, raw)
+- V7: Magazine editorial (white, serif, multi-column, split cover)
+- V8: Split scrollytelling (left narrative, right sticky viz)
+- V9: Warm organic (cream/coral/teal, gradient blobs)
+- V10: Newspaper broadsheet (newsprint, dense columns)
+- V11: Kinetic typography (words as hero, staggered reveals)
 
-**Evaluation design:** Randomized controlled trial — caseworkers randomly assigned access to Nexo. Outcomes tracked via ADE administrative records.
+**User feedback:** Liked V8 scrollytelling, V14 cinematic warm. Wanted teardown at the beginning, mixed backgrounds (dark/warm), dashboard at the end as deep-dive.
 
-**Primary outcomes:** wages, placement rates, unemployment spell duration.
+### Batch 3 — Narrowing (V12–V16)
+**Goal:** Start combining winning elements. Mixed dark/light sections, V2 pipeline spine, V3 dashboard figures, teardown placement.
+- V12: Hybrid sections (dark→warm→dark→cream→dark)
+- V13: Split scrollytelling + dashboard widgets
+- V14: Cinematic warm (snap scroll, alternating bg colors)
+- V15: Full journey (complete story arc with teardown at end)
+- V16: Editorial + data (white magazine with dark data bands)
 
-**Secondary outcomes:** caseworker behavior/workload (purpose-built survey), AI adoption rates and barriers.
+**User feedback:** Liked V14 cinematic warm best. Wanted camera pan movement for teardown. Pipeline should use V2's warm spine style. Dashboard deep-dive at end.
+
+### Batch 4 — Convergence (V17–V21)
+**Goal:** Locked in the structure: early teardown → warm pipeline → cream RCT → dark dashboard. Explored 5 different 3D movement styles.
+- V17: 3D orbit (cards orbit with Y-rotation)
+- V18: Parallax depth (different Z-speeds)
+- V19: Horizontal assembly (slide in → breathe → explode, 3-phase)
+- V20: Camera pan (perspective-origin shifts)
+- V21: Refined multi-phase (assemble → orbit → explode)
+
+**User feedback:** Liked V20's camera pan. Wanted narrative storytelling in the teardown — people arriving, caseworker overwhelmed, then Nexo lights up and gets the Apple-style breakdown.
+
+### Batch 5 — Refinement (V22–V25)
+**Goal:** Perfect the narrative teardown, add chat experience, polish.
+- V22: Definitive — camera pan teardown, warm pipeline, full-page RCT, big dashboard
+- V23: Narrative teardown — jobseekers arrive, caseworker overwhelmed, Nexo enters, capabilities explode
+- V24: Added Laura stepping back, Nexo centering, connecting lines between capabilities, and chat demo section at end
+- V25: **Final** — capability cards land straight (no tilt), GitHub icon in close, gallery organized by iteration groups
+
+---
+
+## User Preferences (discovered through iterations)
+
+- **Movement is key** — the user consistently prefers animated, scroll-driven pages over static ones
+- **Mixed backgrounds per section** — alternating dark/warm/cream as you scroll is the winning pattern
+- **Teardown should tell a story** — not just technical decomposition, but narrative: people arrive → bottleneck → solution → breakdown
+- **Camera pan** (perspective-origin shift) is the preferred 3D movement style
+- **Dashboard as deep-dive at the end** — not the main attraction, but the supporting evidence
+- **V2-style pipeline spine** with alternating left/right cards on warm background
+- **Chat demo** at the end makes it tangible and human
+- **Capability cards should be straight** (no rotation/tilt) after exploding
+- **Full-page sections** for major concepts (RCT methodology gets its own viewport)
+- **Author is sole credit** — Andres Felipe Camacho, MsCAPP, with GitHub icon + repo link
+
+---
+
+## V25 Final Structure
+
+1. **Dark Hero** — "Nexo" wordmark, stats, scroll cue
+2. **Narrative Teardown** (700vh, 7 phases) — profiles arrive → caseworker overwhelmed → Nexo enters beside Laura → Laura steps back → Nexo centers → capabilities explode with connecting lines → settled
+3. **Warm Pipeline** — V2-style spine with scroll fill, alternating cards, coral/teal blobs
+4. **Cream RCT** (full viewport) — treatment/control arms slide in from opposite sides
+5. **Dark Dashboard** (big) — KPIs with counters, locality heatmap, capability bars, time savings, treatment vs control comparison
+6. **Chat Demo** — Simulated Laura + Nexo conversation: CV draft, edit, match, referral, satisfaction
+7. **Close** — Logo, author, GitHub icon + repo link
+
+---
+
+## Research Context
+
+**Research question:** Does providing PES caseworkers with a generative AI assistant improve the quality and speed of worker-job matches?
+
+**Field context:** ADE — Bogotá's main PES office. **38,844 placements in 2025.** 20 localities.
+
+**Design:** Randomized controlled trial — caseworkers randomly assigned access to Nexo.
+
+**Outcomes:** wages, placement rates, unemployment spell duration, caseworker behavior/workload.
 
 **Key principle:** Caseworkers retain full discretion — AI suggests, humans decide.
 
 ### The ADE 5-Stage Pipeline
-1. Registration & CV Creation — jobseeker registered in national DB, CV built
-2. Occupational Orientation — skills, competencies, interests profiled
-3. Training & Skills Gap Referral — targeted upskilling before matching
-4. Job Matching & Referral — vacancies recommended by employer requirements
-5. Placement & Follow-up — wages, retention, contract outcomes tracked
+1. Registration & CV Creation (Nexo: auto CV, −55%)
+2. Occupational Orientation (Nexo: skill mapping, 89%)
+3. Training & Skills Gap (Nexo: gap analysis, −50%)
+4. Job Matching & Referral (Nexo: ranked matches, 91%)
+5. Placement & Follow-up (Nexo: auto reports, −72%)
 
-### What Nexo Does at Each Stage
-1. Automated CV drafting (~40 min saved per case)
-2. Occupational advice & skill mapping (encodes top-caseworker playbooks)
-3. Targeted training recommendations (shortest path to employment)
-4. Ranked match recommendations (91% match accuracy)
-5. Outcome reporting & follow-up drafts (72% admin time reduction)
-
-### Key References (cite when relevant)
-- Belot, Kircher & Muller (2025) — automated occupational advice, *Economic Journal*
-- Brynjolfsson, Li & Raymond (2025) — generative AI at work, *QJE*
-- Le Barbanchon, Hensvik & Rathelot (2023) — AI job recommendations at scale
-- Chen, Sun & Yuan (2025) — AI and skills, Zhejiang University
-- OECD (2024) — PES modernization in the age of AI
-
----
-
-## Design Versions
-
-### V1 — Dark Teardown (`v1-teardown/`)
-**Aesthetic:** Apple-style product teardown / exploded view. Dark navy background, electric cyan + violet + emerald accents. Glassmorphism cards.
-**Mechanism:** Scroll-driven animation. Three cards (Caseworker · Nexo AI · Jobseeker) start stacked, explode apart as user scrolls, SVG connection lines fire between them, match badge appears.
-**Status:** Live. Content reflects real proposal.
-**Key characters:** Laura Sanchez (caseworker), Carlos Herrera (jobseeker, Kennedy locality, logistics background).
-**Iteration ideas:** Add more scroll phases, add employer card as 4th component, add locality-level data overlay.
-
-### V2 — Pipeline Journey (`v2-pipeline/`)
-**Aesthetic:** Animated vertical step flow on dark bg (#020818). Animated grid canvas background. Alternating left/right layout with a glowing spine down the center.
-**Mechanism:** Scroll-driven spine fill, IntersectionObserver step reveals. Each step has a caseworker card (left/right alternating) and an AI assist card on the opposite side.
-**Status:** Live.
-**Iteration ideas:** Add interactive "hover to see AI suggestion" on each step, add before/after time comparison animation, add a mock Nexo UI screenshot on the AI card.
-
-### V3 — Civic Dashboard (`v3-dashboard/`)
-**Aesthetic:** Bloomberg/Tableau-style civic data dashboard. Dark navy (#050D1A). Sticky topbar with live badge. Dense grid of cards.
-**Mechanism:** Animated KPI counters on load, bar fills on scroll intersection, canvas sparkline (placement trend 2023–2025), Bogota locality heatmap (20 localities as color-coded grid with placement density).
-**Status:** Live.
-**Key charts:** Pipeline efficiency before/after AI, RCT treatment vs control comparison bars, AI task coverage per stage, locality heatmap, placement sparkline.
-**Iteration ideas:** Add a real SVG map of Bogotá's 20 localities, add animated scatter plot of match quality, add a "live feed" ticker of simulated matches, wire up real ADE open data if available.
-
-### V4 — Research Editorial (`v4-research/`)
-**Aesthetic:** Clean academic/print aesthetic. Off-white background (#F7F6F2), serif body font (Georgia), heavy sans for headings. Minimal, high-contrast. Scrolling ticker bar. Feels like a premium policy brief.
-**Mechanism:** Scroll reveal only. No complex animations. Sticky nav with section anchors. Scrolling stat ticker. Pull quote styling. RCT outcomes table. References section.
-**Status:** Live.
-**Iteration ideas:** Add a printable/PDF export button, add interactive footnotes, add a timeline/Gantt for project phases, Spanish translation toggle.
+### Key References
+- Belot, Kircher & Muller (2025) — *Economic Journal*
+- Brynjolfsson, Li & Raymond (2025) — *QJE*
+- Le Barbanchon, Hensvik & Rathelot (2023) — AI job recommendations
+- Chen, Sun & Yuan (2025) — AI and skills
+- OECD (2024) — PES modernization
 
 ---
 
 ## Technical Decisions
 
-- **No frameworks, no dependencies, no build step.** Every version is a single self-contained HTML file with embedded CSS and vanilla JS.
-- **No external CDN links** (fonts, libraries). System font stack only.
-- **Canvas for particles/animations** (hero backgrounds, sparklines).
-- **IntersectionObserver** for scroll-triggered reveals and bar fill animations.
-- **Scroll position math** for sticky scroll-driven animations (teardown, pipeline spine).
-- Deploy: `vercel --prod` from the project root.
-- Git: push to `github.com/anfelipecb/dbs-demo-wednesday` then Vercel auto-aliases to `dbs-demo-wednesday.vercel.app`.
-
----
-
-## File Structure
-
-```
-dbs-demo-wednesday/
-├── CLAUDE.md            ← this file
-├── README.md            ← public-facing docs
-├── index.html           ← gallery / version picker
-├── v1-teardown/
-│   └── index.html
-├── v2-pipeline/
-│   └── index.html
-├── v3-dashboard/
-│   └── index.html
-├── v4-research/
-│   └── index.html
-└── proposals/           ← gitignored, local only
-    └── IA_at_workplace.pdf
-```
+- **No frameworks, no dependencies, no build step.** Single self-contained HTML files.
+- **System font stack only** — no external CDN links.
+- **IntersectionObserver** for scroll-triggered reveals.
+- **Scroll position math** for sticky scroll-driven animations (teardown, spine).
+- **CSS 3D transforms + perspective** for teardown (perspective-origin shift = camera pan).
+- Deploy: `vercel --prod` from project root.
 
 ---
 
 ## Content Guidelines
 
-- Always use **38,844** as the ADE placement figure (2025, verified).
-- Bogotá has **20 localities** — all served by ADE.
-- Caseworker discretion framing: *"AI suggests, caseworkers decide"* — never imply AI replaces caseworkers.
-- For new placeholder stats, use: +34% placement probability uplift, 72% admin time saved, 3× cases per caseworker, 91% match accuracy, −18% unemployment spell duration, +12% starting wages.
-- Language: English first. Spanish translation is a planned future iteration.
-- Tone: confident and rigorous for research audiences; engaging and visual for grant committee audiences.
+- **38,844** placements (2025, verified ADE figure)
+- **20 localities** — all served by ADE
+- Caseworker discretion: *"AI suggests, caseworkers decide"*
+- Placeholder stats: +34% placement uplift, 72% admin saved, 3× throughput, 91% match accuracy, −18% unemp. spell, +12% wages
+- Characters: Laura Sanchez (caseworker, 38 cases), Carlos Herrera (jobseeker, Kennedy, logistics, 4mo unemployed)
+- English first. Spanish translation is future work.
 
 ---
 
 ## Planned Future Work
 
-- [ ] Spanish translation toggle on all versions
-- [ ] V5 — Cinematic/immersive full-screen narrative (video-game aesthetic)
-- [ ] Real ADE open data integration in V3 dashboard
-- [ ] SVG map of Bogotá's 20 localities for V3
-- [ ] PDF export / print stylesheet for V4
-- [ ] Mock Nexo UI wireframes embedded in V2 AI assist cards
-- [ ] Add employer-side card to V1 teardown (4th component)
-- [ ] Project timeline / Gantt chart section
+- [ ] Spanish translation toggle
+- [ ] Real SVG map of Bogotá's 20 localities
+- [ ] Real ADE open data integration
+- [ ] PDF export for the editorial version
+- [ ] Mobile optimization pass on V25

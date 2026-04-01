@@ -384,6 +384,52 @@
     /* Disabled state */
     .version-card.soon { pointer-events: none; opacity: 0.55; }
 
+    /* ── ITERATION GROUP ── */
+    .iteration-group {
+      padding: 0 3rem;
+      margin-top: 2.5rem;
+    }
+
+    .ig-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .ig-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .ig-label.cyan   { color: var(--cyan); }
+    .ig-label.violet { color: #C4B5FD; }
+    .ig-label.amber  { color: #FCD34D; }
+    .ig-label.emerald { color: var(--emerald); }
+
+    .ig-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .ig-desc {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    .ig-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
     /* ── FOOTER ── */
     footer {
       padding: 2rem 3rem;
@@ -419,17 +465,108 @@
     <p class="gallery-sub">AI copilot for employment caseworkers — Agencia Distrital de Empleo, Bogota. Select a version to explore.</p>
   </div>
   <div class="header-right">
-    <span class="pill pill-cyan">ADE Bogota</span>
-    <span class="pill pill-violet">University of Chicago</span>
+    <span class="pill pill-cyan">25 Versions</span>
+    <span class="pill pill-violet">5 Iterations</span>
   </div>
 </header>
 
 <div class="divider"></div>
 
-<div class="grid">
+<!-- ══════ FINAL VERSION ══════ -->
+<div class="iteration-group">
+  <div class="ig-header"><span class="ig-label emerald">Final Version</span><div class="ig-line"></div></div>
+  <div class="ig-desc">The culmination of 25 iterations. Narrative storytelling with 7-phase teardown, warm pipeline with scroll spine, big dashboard, and live chat demo.</div>
+  <div class="ig-grid">
+    <a class="version-card v1" href="v25-final/index.html" style="border-color:rgba(16,185,129,.3);box-shadow:0 0 35px rgba(16,185,129,.1);">
+      <div class="preview" style="background:linear-gradient(180deg,#030712 0%,#030712 25%,#FFF9F4 25%,#FFF9F4 50%,#050D1A 50%,#050D1A 75%,#0A0F1E 75%);position:relative;"><div style="position:absolute;top:.75rem;right:.75rem;font-size:.45rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#34D399;background:rgba(16,185,129,.12);padding:.15rem .4rem;border-radius:99px;border:1px solid rgba(16,185,129,.2);">V25 FINAL</div></div>
+      <div class="card-meta-area">
+        <div class="card-top"><span class="version-label">Version 25 — Final</span><span class="status-dot dot-live"></span></div>
+        <div class="version-name">Nexo — Final</div>
+        <div class="version-desc">Jobseekers arrive, caseworker overwhelmed, Nexo enters beside Laura, she steps back, Nexo explodes into 4 straight capability cards with connecting lines. Warm pipeline, RCT, dashboard, chat demo.</div>
+        <div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Narrative</span><span class="mini-tag mt-v">Teardown</span><span class="mini-tag mt-a">Pipeline</span><span class="mini-tag mt-e">Chat</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div>
+      </div>
+    </a>
+  </div>
+</div>
 
-  <!-- V1 — Teardown -->
-  <a class="version-card v1" href="v1-teardown/index.html">
+<!-- ══════ BATCH 5: REFINEMENT (V22-V24) ══════ -->
+<div class="iteration-group">
+  <div class="ig-header"><span class="ig-label violet">Batch 5 — Refinement (V22-V24)</span><div class="ig-line"></div></div>
+  <div class="ig-desc">Polishing the narrative: adding storytelling phases, connecting lines, Laura stepping back, and the chat experience. Each version refined the teardown choreography.</div>
+  <div class="ig-grid">
+    <a class="version-card v1" href="v24-chat/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V24</span><span class="status-dot dot-live"></span></div><div class="version-name">Narrative + Chat</div><div class="version-desc">Added Laura stepping back, Nexo centering, connecting lines, and chat demo at the end.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-v">Lines</span><span class="mini-tag mt-e">Chat</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v23-narrative/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V23</span><span class="status-dot dot-live"></span></div><div class="version-name">Narrative Teardown</div><div class="version-desc">First narrative version: profiles arrive, caseworker overwhelmed, Nexo enters, capabilities explode.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Story</span><span class="mini-tag mt-v">Teardown</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v22-definitive/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V22</span><span class="status-dot dot-live"></span></div><div class="version-name">Definitive</div><div class="version-desc">Camera pan teardown, warm V2-spine pipeline, full-page RCT, big dashboard with localities.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Camera</span><span class="mini-tag mt-a">Warm</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+  </div>
+</div>
+
+<!-- ══════ BATCH 4: CONVERGENCE (V17-V21) ══════ -->
+<div class="iteration-group">
+  <div class="ig-header"><span class="ig-label amber">Batch 4 — Convergence (V17-V21)</span><div class="ig-line"></div></div>
+  <div class="ig-desc">Locked in the winning formula: early teardown + warm pipeline + dark dashboard. These 5 explored different 3D movement styles for the teardown — orbit, parallax, horizontal assembly, camera pan, and a refined multi-phase version.</div>
+  <div class="ig-grid">
+    <a class="version-card v1" href="v17-orbit/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V17</span><span class="status-dot dot-live"></span></div><div class="version-name">3D Orbit</div><div class="version-desc">Cards orbit with Y-rotation and Z-depth. Smooth spread.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Orbit</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v18-parallax/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V18</span><span class="status-dot dot-live"></span></div><div class="version-name">Parallax Depth</div><div class="version-desc">Layers at different Z-depths, different scroll speeds.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-v">Parallax</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v19-horizontal/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V19</span><span class="status-dot dot-live"></span></div><div class="version-name">Horizontal Assembly</div><div class="version-desc">3-phase: cards slide in, assemble, breathe, then explode.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">3-phase</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v20-campan/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V20</span><span class="status-dot dot-live"></span></div><div class="version-name">Camera Pan</div><div class="version-desc">Perspective-origin shifts as you scroll — camera tracking through the system.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Camera</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v21-refined/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V21</span><span class="status-dot dot-live"></span></div><div class="version-name">Refined Multi-phase</div><div class="version-desc">Assemble, orbit the scene, then full explosion with camera pan.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-v">Best-of</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+  </div>
+</div>
+
+<!-- ══════ BATCH 3: NARROWING (V12-V16) ══════ -->
+<div class="iteration-group">
+  <div class="ig-header"><span class="ig-label cyan">Batch 3 — Narrowing (V12-V16)</span><div class="ig-line"></div></div>
+  <div class="ig-desc">Started combining favorite elements: mixed dark/light backgrounds per section, V2 pipeline movement, V3 dashboard figures, split scrollytelling, and the teardown at the end. Found the winning structure here.</div>
+  <div class="ig-grid">
+    <a class="version-card v1" href="v12-hybrid/index.html"><div class="preview" style="background:linear-gradient(180deg,#030712 25%,#FFF9F4 25%,#FFF9F4 50%,#050D1A 50%,#050D1A 75%,#F7F6F2 75%);"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V12</span><span class="status-dot dot-live"></span></div><div class="version-name">Hybrid Sections</div><div class="version-desc">Dark hero, warm pipeline, dark dashboard, cream method, dark teardown.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-a">Mixed</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v13-splitdash/index.html"><div class="preview" style="background:#060B16;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V13</span><span class="status-dot dot-live"></span></div><div class="version-name">Split + Dashboard</div><div class="version-desc">Scrollytelling left + sticky dashboard widgets right.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Split</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v14-cine-warm/index.html"><div class="preview" style="background:linear-gradient(180deg,#030712 33%,#FFF9F4 33%,#FFF9F4 66%,#0A0520 66%);"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V14</span><span class="status-dot dot-live"></span></div><div class="version-name">Cinematic Warm</div><div class="version-desc">Snap scroll alternating dark/warm/cream sections with teardown at end.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-a">Snap</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v15-journey/index.html"><div class="preview" style="background:linear-gradient(180deg,#030712 20%,#FFF9F4 20%,#FFF9F4 40%,#050D1A 40%,#050D1A 60%,#F7F6F2 60%,#F7F6F2 80%,#030712 80%);"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V15</span><span class="status-dot dot-live"></span></div><div class="version-name">Full Journey</div><div class="version-desc">Complete story arc ending with the teardown climax.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-v">Story arc</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v4" href="v16-editdata/index.html"><div class="preview" style="background:linear-gradient(180deg,#fff 40%,#050D1A 40%,#050D1A 60%,#fff 60%);"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V16</span><span class="status-dot dot-live"></span></div><div class="version-name">Editorial + Data</div><div class="version-desc">White magazine prose with dark data bands embedded.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-a">Light</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+  </div>
+</div>
+
+<!-- ══════ BATCH 2: WIDE EXPLORATION (V6-V11) ══════ -->
+<div class="iteration-group">
+  <div class="ig-header"><span class="ig-label cyan">Batch 2 — Wide Exploration (V6-V11)</span><div class="ig-line"></div></div>
+  <div class="ig-desc">Radically different styles: brutalist, magazine editorial, split scrollytelling, warm organic, newspaper broadsheet, kinetic typography. Testing every direction before converging.</div>
+  <div class="ig-grid">
+    <a class="version-card v1" href="v6-brutalist/index.html"><div class="preview" style="background:#000;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V6</span><span class="status-dot dot-live"></span></div><div class="version-name">Brutalist</div><div class="version-desc">Monospace, neon green, ASCII diagram, raw.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-e">Raw</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v4" href="v7-magazine/index.html"><div class="preview" style="background:#fff;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V7</span><span class="status-dot dot-live"></span></div><div class="version-name">Magazine Light</div><div class="version-desc">White editorial, serif, split cover, multi-column.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-a">Light</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v8-split/index.html"><div class="preview" style="background:#080C14;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V8</span><span class="status-dot dot-live"></span></div><div class="version-name">Split Scrollytelling</div><div class="version-desc">Left narrative, right sticky viz that swaps as you scroll.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Split</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v4" href="v9-warm/index.html"><div class="preview" style="background:#FFF9F4;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V9</span><span class="status-dot dot-live"></span></div><div class="version-name">Warm Organic</div><div class="version-desc">Cream/coral/teal, gradient blobs, rounded cards.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-a">Light</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v4" href="v10-newspaper/index.html"><div class="preview" style="background:#F5F0E8;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V10</span><span class="status-dot dot-live"></span></div><div class="version-name">Newspaper</div><div class="version-desc">Dense broadsheet, multi-column, newsprint, sidebar stats.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-a">Light</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v11-kinetic/index.html"><div class="preview" style="background:#020206;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V11</span><span class="status-dot dot-live"></span></div><div class="version-name">Kinetic Typography</div><div class="version-desc">Words as the hero — staggered reveals, giant numbers.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-v">Type</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+  </div>
+</div>
+
+<!-- ══════ BATCH 1: INITIAL EXPLORATION (V1-V5) ══════ -->
+<div class="iteration-group">
+  <div class="ig-header"><span class="ig-label cyan">Batch 1 — Initial Exploration (V1-V5)</span><div class="ig-line"></div></div>
+  <div class="ig-desc">The first 5 radically different takes: Apple teardown, animated pipeline, civic dashboard, academic editorial, and cinematic snap scroll. Established the design vocabulary.</div>
+  <div class="ig-grid">
+    <a class="version-card v1" href="v1-teardown/index.html"><div class="preview" style="background:#030712;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V1</span><span class="status-dot dot-live"></span></div><div class="version-name">Dark Teardown</div><div class="version-desc">Apple-style exploded view with scroll-driven 3D cards.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">3D</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v2-pipeline/index.html"><div class="preview" style="background:#020818;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V2</span><span class="status-dot dot-live"></span></div><div class="version-name">Pipeline Journey</div><div class="version-desc">Vertical spine, alternating steps, AI callouts.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Spine</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v3-dashboard/index.html"><div class="preview" style="background:#050D1A;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V3</span><span class="status-dot dot-live"></span></div><div class="version-name">Civic Dashboard</div><div class="version-desc">KPI grid, animated bars, locality heatmap, comparison charts.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-v">Data</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v4" href="v4-research/index.html"><div class="preview" style="background:#F7F6F2;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V4</span><span class="status-dot dot-live"></span></div><div class="version-name">Research Editorial</div><div class="version-desc">Serif, academic, print-like. Policy brief format.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-a">Light</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+    <a class="version-card v1" href="v5-cinematic/index.html"><div class="preview" style="background:#050505;"></div><div class="card-meta-area"><div class="card-top"><span class="version-label">V5</span><span class="status-dot dot-live"></span></div><div class="version-name">Cinematic Scroll</div><div class="version-desc">Full-viewport snap, one idea per screen, giant type.</div><div class="card-footer"><div class="tag-row"><span class="mini-tag mt-c">Snap</span></div><div class="open-btn">Open <span class="arrow">&#8599;</span></div></div></div></a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left">
+    <strong>Nexo</strong> — 25 design iterations for an AI caseworker copilot<br>
+    Andres Felipe Camacho, MsCAPP &nbsp;&middot;&nbsp;
+    <a href="https://github.com/anfelipecb" target="_blank" style="color:var(--cyan); text-decoration:none;">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:middle;margin-right:.2rem;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      github.com/anfelipecb
+    </a>
+  </div>
+  <div class="footer-right">dbs-demo-wednesday &nbsp;&middot;&nbsp; 2025</div>
+</footer>
+
+</body>
+</html>
     <div class="preview prev-v1">
       <div class="mock-cards">
         <div class="mock-card mc-cyan"></div>
