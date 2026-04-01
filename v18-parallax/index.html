@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo — Parallax Depth</title>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;overflow-x:hidden;background:#030712;color:#F1F5F9}
+    .back{position:fixed;top:1rem;left:1rem;z-index:200;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:.3rem .7rem;border-radius:99px;backdrop-filter:blur(12px);color:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.4)}.back:hover{color:#fff}
+    #progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#06B6D4,#8B5CF6,#E8634A,#10B981);width:0%;z-index:200}
+
+    .section{position:relative;overflow:hidden;padding:6rem 2rem;display:flex;flex-direction:column;align-items:center;text-align:center}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s,transform .7s}.reveal.in{opacity:1;transform:translateY(0)}
+
+    /* ── HERO ── */
+    .hero{min-height:100vh;background:#030712;justify-content:center}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 20%,rgba(6,182,212,.12),transparent 60%)}
+    .h-logo{font-size:clamp(7rem,20vw,15rem);font-weight:900;letter-spacing:-.06em;line-height:.85;background:linear-gradient(180deg,#fff 30%,rgba(255,255,255,.1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+    .h-sub{font-size:clamp(.9rem,2vw,1.15rem);color:#64748B;margin-top:1.5rem;max-width:440px}.h-sub strong{color:#F1F5F9;font-weight:500}
+    .scroll-cue{position:absolute;bottom:2.5rem;font-size:.55rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.15);animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:.15}50%{opacity:.5}}
+
+    /* ── 3D TEARDOWN (scroll-driven) ── */
+    #teardown{height:350vh;position:relative}
+    .td-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;perspective:1200px}
+    .td-sticky::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(139,92,246,.08),transparent 60%)}
+    .td-label{position:absolute;top:2.5rem;left:50%;transform:translateX(-50%);font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#64748B;transition:opacity .5s}
+    .td-phase{position:absolute;bottom:3.5rem;left:50%;transform:translateX(-50%);text-align:center}
+    .td-phase-title{font-size:1.1rem;font-weight:700;letter-spacing:-.02em}
+    .td-phase-sub{font-size:.7rem;color:#64748B;margin-top:.3rem}
+
+    .orbit-stage{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d}
+
+    .orbit-card{position:absolute;width:240px;padding:1.3rem;border-radius:18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);text-align:left;will-change:transform;transition:box-shadow .3s}
+    .oc-ico{font-size:1.1rem;margin-bottom:.4rem}
+    .oc-kicker{font-size:.48rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.1rem}
+    .oc-name{font-size:.88rem;font-weight:700;margin-bottom:.25rem}
+    .oc-desc{font-size:.62rem;color:#64748B;line-height:1.5}
+    .oc-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.6rem}
+    .oc-tag{font-size:.5rem;font-weight:700;padding:.12rem .4rem;border-radius:99px;border:1px solid}
+
+    /* ── WARM STORY ── */
+    .warm{background:#FFF9F4;color:#1A1612;padding:8rem 2rem}
+    .warm .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none}
+    .w-tag{font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#E8634A;margin-bottom:.75rem}
+    .w-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:.75rem}
+    .w-sub{font-size:.95rem;color:#8B7E72;max-width:500px;margin:0 auto 3rem;line-height:1.7}.w-sub strong{color:#1A1612}
+
+    .pipe-cards{display:flex;flex-direction:column;gap:.65rem;max-width:580px;width:100%;text-align:left}
+    .pc{display:grid;grid-template-columns:40px 1fr auto;gap:1rem;padding:1rem;background:#fff;border-radius:14px;border:1px solid #F0E6D8;box-shadow:0 2px 6px rgba(0,0,0,.02);opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+    .pc.show{opacity:1;transform:translateY(0)}
+    .pc-n{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem}
+    .pc-name{font-size:.88rem;font-weight:700}.pc-desc{font-size:.65rem;color:#8B7E72;margin-top:.15rem;line-height:1.4}
+    .pc-ai{background:#FEEEE3;border-radius:10px;padding:.45rem .6rem;text-align:center;align-self:center;min-width:90px}
+    .pc-ai-tag{font-size:.45rem;font-weight:700;color:#E8634A;letter-spacing:.1em;text-transform:uppercase}.pc-ai-val{font-size:.62rem;font-weight:700;color:#1A1612;margin-top:.08rem}
+
+    /* ── DARK DASHBOARD ── */
+    .dash{background:#050D1A;color:#F1F5F9;padding:8rem 2rem}
+    .da-tag{font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#06B6D4;margin-bottom:.75rem}
+    .da-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-.03em;margin-bottom:1rem}
+    .da-sub{font-size:.9rem;color:#64748B;max-width:480px;margin:0 auto 3rem;line-height:1.65}
+
+    .d-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;max-width:700px;width:100%}
+    @media(max-width:600px){.d-grid{grid-template-columns:repeat(2,1fr)}}
+    .d-c{padding:1.3rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+    .d-c.show{opacity:1;transform:translateY(0)}
+    .d-v{font-size:2rem;font-weight:800;letter-spacing:-.04em;line-height:1;background:linear-gradient(135deg,#06B6D4,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .d-l{font-size:.55rem;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-top:.3rem}
+
+    .bars{display:flex;flex-direction:column;gap:.65rem;max-width:450px;width:100%;margin-top:2.5rem}
+    .b-r{display:flex;flex-direction:column;gap:.25rem}.b-meta{display:flex;justify-content:space-between;font-size:.6rem}.b-name{color:#64748B}.b-val{color:#F1F5F9;font-weight:700}
+    .b-track{height:5px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden}
+    .b-fill{height:100%;border-radius:99px;width:0%;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+
+    .compare{display:flex;flex-direction:column;gap:1.2rem;max-width:450px;width:100%;margin-top:3rem}
+    .cmp-lbl{font-size:.6rem;color:#64748B;font-weight:600;margin-bottom:.35rem}
+    .cmp-bars{display:flex;flex-direction:column;gap:.25rem}
+    .cmp-bar{display:grid;grid-template-columns:50px 1fr 36px;align-items:center;gap:.4rem;font-size:.58rem}
+    .cmp-tag{font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+    .cmp-track{height:7px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden}
+    .cmp-fill{height:100%;border-radius:99px;width:0%;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+    .cmp-num{font-weight:700;text-align:right}
+
+    /* ── CREAM METHOD ── */
+    .method{background:#F7F6F2;color:#111;padding:6rem 2rem}
+    .m-tag{font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#1D4ED8;margin-bottom:.75rem}
+    .m-title{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;letter-spacing:-.03em;margin-bottom:.75rem}
+    .m-sub{font-size:.9rem;color:#666;max-width:480px;margin:0 auto 2.5rem;line-height:1.65}
+    .rct{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;max-width:560px;width:100%;text-align:left}
+    @media(max-width:600px){.rct{grid-template-columns:1fr}}
+    .rct-arm{padding:1.5rem;border-radius:14px;border:1px solid}
+    .arm-t{background:rgba(29,78,216,.04);border-color:rgba(29,78,216,.15)}.arm-c{background:#fff;border-color:#E0DDD5}
+    .rct-tag{font-size:.52rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4rem}
+    .arm-t .rct-tag{color:#1D4ED8}.arm-c .rct-tag{color:#888}
+    .rct-name{font-size:.95rem;font-weight:700;margin-bottom:.3rem}.rct-body{font-size:.72rem;color:#666;line-height:1.55}.rct-body strong{color:#111}
+
+    footer{background:#030712;color:#64748B;padding:2rem;text-align:center;font-size:.7rem;border-top:1px solid rgba(255,255,255,.06)}
+    footer strong{color:#F1F5F9}footer a{color:#06B6D4;text-decoration:none}
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">&#8592; Gallery</a>
+<div id="progress"></div>
+
+<!-- HERO -->
+<section class="section hero">
+  <div class="h-logo">Nexo</div>
+  <p class="h-sub"><strong>AI copilot for caseworkers.</strong> Scroll to see the system decompose.</p>
+  <div class="scroll-cue">Scroll &darr;</div>
+</section>
+
+<!-- 3D TEARDOWN -->
+<section id="teardown">
+  <div class="td-sticky">
+    <div class="td-label">System Architecture</div>
+
+    <div class="orbit-stage" id="orbit-stage">
+      <!-- Caseworker -->
+      <div class="orbit-card" id="oc-1" style="background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.18);">
+        <div class="oc-ico">&#128101;</div>
+        <div class="oc-kicker" style="color:#06B6D4;">ADE Caseworker</div>
+        <div class="oc-name">Laura Sanchez</div>
+        <div class="oc-desc">Agencia Distrital de Empleo. 38 active cases. Full discretion on every AI suggestion.</div>
+        <div class="oc-tags">
+          <span class="oc-tag" style="color:#67E8F9;border-color:rgba(6,182,212,.25);">CV Review</span>
+          <span class="oc-tag" style="color:#67E8F9;border-color:rgba(6,182,212,.25);">Skills</span>
+          <span class="oc-tag" style="color:#67E8F9;border-color:rgba(6,182,212,.25);">Matching</span>
+        </div>
+      </div>
+
+      <!-- Nexo AI -->
+      <div class="orbit-card" id="oc-2" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);box-shadow:0 0 40px rgba(139,92,246,.1);">
+        <div class="oc-ico">&#9670;</div>
+        <div class="oc-kicker" style="color:#A78BFA;">Nexo AI Engine</div>
+        <div class="oc-name">Copilot Core</div>
+        <div class="oc-desc">CV generation 94% · Skill profiling 89% · Job matching 91% · Admin automation 72%</div>
+        <div class="oc-tags">
+          <span class="oc-tag" style="color:#C4B5FD;border-color:rgba(139,92,246,.3);">GenAI</span>
+          <span class="oc-tag" style="color:#C4B5FD;border-color:rgba(139,92,246,.3);">Semantic</span>
+          <span class="oc-tag" style="color:#C4B5FD;border-color:rgba(139,92,246,.3);">Ranking</span>
+        </div>
+      </div>
+
+      <!-- Jobseeker -->
+      <div class="orbit-card" id="oc-3" style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.18);">
+        <div class="oc-ico">&#128100;</div>
+        <div class="oc-kicker" style="color:#10B981;">Jobseeker</div>
+        <div class="oc-name">Carlos Herrera</div>
+        <div class="oc-desc">Kennedy, Bogota. Logistics &amp; operations. 4 months unemployed. Secondary education.</div>
+        <div class="oc-tags">
+          <span class="oc-tag" style="color:#6EE7B7;border-color:rgba(16,185,129,.25);">Logistics</span>
+          <span class="oc-tag" style="color:#6EE7B7;border-color:rgba(16,185,129,.25);">Ops</span>
+          <span class="oc-tag" style="color:#6EE7B7;border-color:rgba(16,185,129,.25);">Available</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="td-phase">
+      <div class="td-phase-title" id="phase-title">Three components, one system</div>
+      <div class="td-phase-sub" id="phase-sub">Scroll to decompose the architecture</div>
+    </div>
+  </div>
+</section>
+
+<!-- WARM PIPELINE -->
+<section class="section warm">
+  <div class="blob" style="width:350px;height:350px;background:#FECACA;top:-80px;right:-80px;"></div>
+  <div class="blob" style="width:280px;height:280px;background:#CCFBF1;bottom:-60px;left:-60px;"></div>
+  <div class="w-tag reveal">The Pipeline</div>
+  <h2 class="w-title reveal">Five stages, amplified</h2>
+  <p class="w-sub reveal">Each caseworker follows the ADE action path. <strong>Nexo assists at every step</strong> — caseworkers retain full discretion.</p>
+  <div class="pipe-cards" id="pipe">
+    <div class="pc"><div class="pc-n" style="background:rgba(232,99,74,.1);color:#E8634A;">1</div><div><div class="pc-name">Registration &amp; CV</div><div class="pc-desc">Profile built, CV created.</div></div><div class="pc-ai"><div class="pc-ai-tag">Nexo</div><div class="pc-ai-val">-55%</div></div></div>
+    <div class="pc"><div class="pc-n" style="background:rgba(26,139,124,.1);color:#1A8B7C;">2</div><div><div class="pc-name">Orientation</div><div class="pc-desc">Skills assessed.</div></div><div class="pc-ai"><div class="pc-ai-tag">Nexo</div><div class="pc-ai-val">89%</div></div></div>
+    <div class="pc"><div class="pc-n" style="background:rgba(232,99,74,.1);color:#E8634A;">3</div><div><div class="pc-name">Training</div><div class="pc-desc">Gaps closed.</div></div><div class="pc-ai"><div class="pc-ai-tag">Nexo</div><div class="pc-ai-val">-50%</div></div></div>
+    <div class="pc"><div class="pc-n" style="background:rgba(26,139,124,.1);color:#1A8B7C;">4</div><div><div class="pc-name">Job Matching</div><div class="pc-desc">Vacancies ranked.</div></div><div class="pc-ai"><div class="pc-ai-tag">Nexo</div><div class="pc-ai-val">91%</div></div></div>
+    <div class="pc"><div class="pc-n" style="background:rgba(232,99,74,.1);color:#E8634A;">5</div><div><div class="pc-name">Follow-up</div><div class="pc-desc">Outcomes tracked.</div></div><div class="pc-ai"><div class="pc-ai-tag">Nexo</div><div class="pc-ai-val">-72%</div></div></div>
+  </div>
+</section>
+
+<!-- CREAM METHOD -->
+<section class="section method">
+  <div class="m-tag reveal">Methodology</div>
+  <h2 class="m-title reveal">Randomized Controlled Trial</h2>
+  <p class="m-sub reveal">Caseworkers randomly assigned to Nexo. Outcomes tracked via ADE records.</p>
+  <div class="rct reveal">
+    <div class="rct-arm arm-t"><div class="rct-tag">Treatment</div><div class="rct-name">Nexo AI Copilot</div><div class="rct-body"><strong>Full access</strong>. Human discretion retained.</div></div>
+    <div class="rct-arm arm-c"><div class="rct-tag">Control</div><div class="rct-name">Standard Workflow</div><div class="rct-body"><strong>Same jobseekers</strong>. No AI. Causal isolation.</div></div>
+  </div>
+</section>
+
+<!-- DARK DASHBOARD (deep-dive end) -->
+<section class="section dash">
+  <div class="da-tag reveal">Deep Dive</div>
+  <h2 class="da-title reveal">Projected outcomes</h2>
+  <p class="da-sub reveal">Based on comparable AI-at-work interventions in the literature.</p>
+  <div class="d-grid" id="d-grid">
+    <div class="d-c"><div class="d-v">+34%</div><div class="d-l">Placement rate</div></div>
+    <div class="d-c"><div class="d-v">-18%</div><div class="d-l">Unemp. spell</div></div>
+    <div class="d-c"><div class="d-v">3x</div><div class="d-l">Cases / worker</div></div>
+    <div class="d-c"><div class="d-v">+12%</div><div class="d-l">Starting wages</div></div>
+  </div>
+  <div class="bars reveal" id="bars">
+    <div class="b-r"><div class="b-meta"><span class="b-name">CV Drafting</span><span class="b-val">94%</span></div><div class="b-track"><div class="b-fill" data-w="94" style="background:linear-gradient(90deg,#06B6D4,#8B5CF6);"></div></div></div>
+    <div class="b-r"><div class="b-meta"><span class="b-name">Skill Profiling</span><span class="b-val">89%</span></div><div class="b-track"><div class="b-fill" data-w="89" style="background:linear-gradient(90deg,#8B5CF6,#A78BFA);"></div></div></div>
+    <div class="b-r"><div class="b-meta"><span class="b-name">Job Matching</span><span class="b-val">91%</span></div><div class="b-track"><div class="b-fill" data-w="91" style="background:linear-gradient(90deg,#10B981,#06B6D4);"></div></div></div>
+    <div class="b-r"><div class="b-meta"><span class="b-name">Admin Automation</span><span class="b-val">72%</span></div><div class="b-track"><div class="b-fill" data-w="72" style="background:linear-gradient(90deg,#F59E0B,#10B981);"></div></div></div>
+  </div>
+  <div class="compare reveal" id="compare">
+    <div style="font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#8B5CF6;margin-bottom:1rem;">Treatment vs Control</div>
+    <div><div class="cmp-lbl">Placement Rate</div><div class="cmp-bars"><div class="cmp-bar"><span class="cmp-tag" style="color:#06B6D4;">AI</span><div class="cmp-track"><div class="cmp-fill" data-w="78" style="background:linear-gradient(90deg,#06B6D4,#8B5CF6);"></div></div><span class="cmp-num" style="color:#F1F5F9;">78%</span></div><div class="cmp-bar"><span class="cmp-tag" style="color:#64748B;">Ctrl</span><div class="cmp-track"><div class="cmp-fill" data-w="58" style="background:#334155;"></div></div><span class="cmp-num" style="color:#64748B;">58%</span></div></div></div>
+    <div><div class="cmp-lbl">Starting Wages</div><div class="cmp-bars"><div class="cmp-bar"><span class="cmp-tag" style="color:#10B981;">AI</span><div class="cmp-track"><div class="cmp-fill" data-w="82" style="background:linear-gradient(90deg,#10B981,#06B6D4);"></div></div><span class="cmp-num" style="color:#F1F5F9;">+12%</span></div><div class="cmp-bar"><span class="cmp-tag" style="color:#64748B;">Ctrl</span><div class="cmp-track"><div class="cmp-fill" data-w="68" style="background:#334155;"></div></div><span class="cmp-num" style="color:#64748B;">Base</span></div></div></div>
+    <div><div class="cmp-lbl">Throughput</div><div class="cmp-bars"><div class="cmp-bar"><span class="cmp-tag" style="color:#F59E0B;">AI</span><div class="cmp-track"><div class="cmp-fill" data-w="90" style="background:linear-gradient(90deg,#F59E0B,#10B981);"></div></div><span class="cmp-num" style="color:#F1F5F9;">3x</span></div><div class="cmp-bar"><span class="cmp-tag" style="color:#64748B;">Ctrl</span><div class="cmp-track"><div class="cmp-fill" data-w="30" style="background:#334155;"></div></div><span class="cmp-num" style="color:#64748B;">1x</span></div></div></div>
+  </div>
+  <div class="reveal" style="margin-top:3rem;font-size:.72rem;color:#64748B;"><strong style="color:#F1F5F9;">Andres Felipe Camacho</strong> &middot; MsCAPP &middot; <a href="https://github.com/anfelipecb" style="color:#06B6D4;text-decoration:none;">github.com/anfelipecb</a></div>
+</section>
+
+<footer><a href="../index.html" style="color:#06B6D4;text-decoration:none;">&#8592; Gallery</a> &middot; Nexo &middot; 2025</footer>
+
+<script>
+// Progress
+const bar=document.getElementById('progress');
+window.addEventListener('scroll',()=>{bar.style.width=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight)*100)+'%';},{passive:true});
+
+// 3D ORBIT TEARDOWN
+(function(){
+  const section=document.getElementById('teardown');
+  const c1=document.getElementById('oc-1');
+  const c2=document.getElementById('oc-2');
+  const c3=document.getElementById('oc-3');
+  const ptitle=document.getElementById('phase-title');
+  const psub=document.getElementById('phase-sub');
+
+  const phases=[
+    {t:'Three components, one system',s:'Scroll to decompose the architecture'},
+    {t:'Separating the layers',s:'Each component operates independently'},
+    {t:'The AI at the center',s:'Nexo connects caseworker to jobseeker'},
+    {t:'Full decomposition',s:'Human judgment + AI suggestions + jobseeker outcomes'}
+  ];
+
+  function ease(t){return t<.5?2*t*t:-1+(4-2*t)*t}
+  function lerp(a,b,t){return a+(b-a)*t}
+  function clamp(v){return Math.max(0,Math.min(1,v))}
+
+  function update(){
+    const r=section.getBoundingClientRect();
+    const scrollH=section.offsetHeight-window.innerHeight;
+    const p=clamp(-r.top/scrollH);
+    const e=ease(p);
+
+    // Phase
+    const pi=Math.min(3,Math.floor(p*4));
+    ptitle.textContent=phases[pi].t;
+    psub.textContent=phases[pi].s;
+
+    // Card 1 (caseworker) — parallax: moves UP faster, goes far left, heavy Z
+    const x1=lerp(0,-350,e);
+    const y1=lerp(0,-80,e);
+    const z1=lerp(0,160,e);
+    const ry1=lerp(0,-15,e);
+    c1.style.transform=`translate3d(${x1}px,${y1}px,${z1}px) rotateY(${ry1}deg)`;
+    c1.style.opacity=lerp(1,0.85,e);
+
+    // Card 2 (engine) — moves forward in Z, grows, subtle sway
+    const s2=lerp(1,1.15,e);
+    const z2=lerp(0,100,e);
+    const sway=Math.sin(p*Math.PI*3)*8;
+    c2.style.transform=`translate3d(${sway}px,0,${z2}px) scale(${s2})`;
+    c2.style.boxShadow=`0 0 ${lerp(20,100,e)}px rgba(139,92,246,${lerp(.1,.4,e)})`;
+
+    // Card 3 (jobseeker) — parallax: moves DOWN slower, goes right, less Z
+    const x3=lerp(0,350,e);
+    const y3=lerp(0,80,e);
+    const z3=lerp(0,60,e);
+    const ry3=lerp(0,15,e);
+    c3.style.transform=`translate3d(${x3}px,${y3}px,${z3}px) rotateY(${ry3}deg)`;
+    c3.style.opacity=lerp(1,0.85,e);
+  }
+
+  window.addEventListener('scroll',update,{passive:true});
+  update();
+})();
+
+// Reveals
+const io=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('in');io.unobserve(el.target);}});},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Stagger
+const sio=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){
+  el.target.querySelectorAll('.pc,.d-c').forEach((c,i)=>{setTimeout(()=>c.classList.add('show'),i*100);});
+  el.target.querySelectorAll('.b-fill,.cmp-fill').forEach(b=>{b.style.width=b.dataset.w+'%';});
+  sio.unobserve(el.target);
+}});},{threshold:.15});
+document.querySelectorAll('#pipe,#d-grid,#bars,#compare').forEach(el=>sio.observe(el));
+</script>
+</body>
+</html>
